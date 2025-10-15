@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hide loading screen after short delay
     setTimeout(() => {
         hideLoadingScreen();
-        console.log('[Init] ✓ PaperLens Mini ready');
+        console.log('[Init] [OK] PaperLens Mini ready');
         console.log(`[Init] Max results: 300, From year: ${defaultFromYear}`);
     }, 500);
 });
@@ -223,13 +223,13 @@ async function handleSearch() {
             updateWizardSteps();
             updateFixedNavigation();
             
-            console.log('[Search] ✓ Found', result.count, 'papers');
+            console.log('[Search] [OK] Found', result.count, 'papers');
         } else {
             showStatus('search-status', `Error: ${result.error}`, 'error');
-            console.error('[Search] ✗ Error:', result.error);
+            console.error('[Search] [ERROR] Error:', result.error);
         }
     } catch (error) {
-        console.error('[Search] ✗ Exception:', error);
+        console.error('[Search] [ERROR] Exception:', error);
         showStatus('search-status', `Error: ${error.message}`, 'error');
     } finally {
         searchBtn.disabled = false;
@@ -320,13 +320,13 @@ async function handleVisualization() {
             
             displayVisualizations(result.visualizations);
             showStatus('viz-status', 'Visualizations generated successfully', 'success');
-            console.log('[Viz] ✓ Visualizations generated');
+            console.log('[Viz] [OK] Visualizations generated');
         } else {
             showStatus('viz-status', `Error: ${result.error}`, 'error');
-            console.error('[Viz] ✗ Error:', result.error);
+            console.error('[Viz] [ERROR] Error:', result.error);
         }
     } catch (error) {
-        console.error('[Viz] ✗ Exception:', error);
+        console.error('[Viz] [ERROR] Exception:', error);
         showStatus('viz-status', `Error: ${error.message}`, 'error');
     } finally {
         generateBtn.disabled = false;
@@ -455,13 +455,13 @@ async function handleExport(format) {
         
         if (result.success) {
             showStatus('export-status', `Successfully exported to: ${result.filepath}`, 'success');
-            console.log('[Export] ✓ Exported to:', result.filepath);
+            console.log('[Export] [OK] Exported to:', result.filepath);
         } else {
             showStatus('export-status', `Error: ${result.error}`, 'error');
-            console.error('[Export] ✗ Error:', result.error);
+            console.error('[Export] [ERROR] Error:', result.error);
         }
     } catch (error) {
-        console.error('[Export] ✗ Exception:', error);
+        console.error('[Export] [ERROR] Exception:', error);
         showStatus('export-status', `Error: ${error.message}`, 'error');
     }
 }

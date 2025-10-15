@@ -95,7 +95,7 @@ class API:
             if keywords and len(keywords) >= 2:
                 viz_network = self.visualizer.create_keyword_network(keywords, papers)
                 visualizations['network'] = viz_network
-                print("[API] ✓ Keyword network created")
+                print("[API] [OK] Keyword network created")
             else:
                 print("[API] ! Not enough keywords for network")
             

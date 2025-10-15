@@ -29,7 +29,7 @@ class Exporter:
         df = pd.DataFrame(papers)
         df.to_csv(filepath, index=False, encoding='utf-8-sig')
         
-        print(f"✓ Exported to CSV: {filepath}")
+        print(f"[OK] Exported to CSV: {filepath}")
         return str(filepath)
     
     def export_to_excel(self, papers: List[Dict], filename: str = None) -> str:
@@ -55,7 +55,7 @@ class Exporter:
             df_summary = pd.DataFrame([summary_data])
             df_summary.to_excel(writer, sheet_name='Summary', index=False)
         
-        print(f"✓ Exported to Excel: {filepath}")
+        print(f"[OK] Exported to Excel: {filepath}")
         return str(filepath)
     
     def export_to_json(self, papers: List[Dict], filename: str = None) -> str:
@@ -77,7 +77,7 @@ class Exporter:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
         
-        print(f"✓ Exported to JSON: {filepath}")
+        print(f"[OK] Exported to JSON: {filepath}")
         return str(filepath)
     
     def export_to_pdf(self, papers: List[Dict], filename: str = None) -> str:
@@ -145,7 +145,7 @@ class Exporter:
         
         pdf.output(str(filepath))
         
-        print(f"✓ Exported to PDF: {filepath}")
+        print(f"[OK] Exported to PDF: {filepath}")
         return str(filepath)
 
 

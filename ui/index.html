@@ -23,9 +23,9 @@
         // Check if Plotly is loaded
         window.addEventListener('load', () => {
             if (typeof Plotly !== 'undefined') {
-                console.log('✓ Plotly.js loaded successfully, version:', Plotly.version);
+                console.log('[OK] Plotly.js loaded successfully, version:', Plotly.version);
             } else {
-                console.error('✗ Plotly.js failed to load!');
+                console.error('[ERROR] Plotly.js failed to load!');
             }
         });
     </script>
