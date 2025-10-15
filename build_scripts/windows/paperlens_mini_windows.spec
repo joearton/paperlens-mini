@@ -19,6 +19,7 @@ datas = [
     (str(base_dir / 'ui'), 'ui'),                                # UI folder (HTML, JS, CSS)
     (str(base_dir / 'config.py'), '.'),                          # Configuration file
     (str(base_dir / 'LICENSE'), '.'),                            # License file
+    (str(Path(SPECPATH) / 'favicon.png'), 'ui/images'),          # Updated favicon
 ]
 
 # Hidden imports - modules that PyInstaller might miss during analysis
@@ -79,7 +80,7 @@ hiddenimports = [
 excludes = [
     'tkinter',        # Not needed (GUI)
     'test',           # Test modules
-    'unittest',       # Unit tests  
+    # 'unittest',     # Removed from excludes - needed by pandas and other libraries
     'doctest',        # Testing
     'IPython',        # Interactive
     'jupyter',        # Notebooks
@@ -139,6 +140,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=str(Path(SPECPATH) / 'PaperLensMini.ico'),  # Windows icon
+    icon=str(Path(SPECPATH) / 'favicon.png'),  # Updated favicon as Windows icon
     version_file=None,
 )
