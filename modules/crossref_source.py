@@ -22,12 +22,21 @@ class CrossrefSource(BaseSource):
             "delay_between_requests": 1.5,
         }
     
-    def search(self, query: str, max_results: int = 100, from_year: Optional[int] = None) -> List[SearchResult]:
-        """Search CrossRef for academic papers."""
+    def search(self, query: str, max_results: int = 100, from_year: Optional[int] = None,
+               search_type: str = 'all') -> List[SearchResult]:
+        """
+        Search CrossRef for academic papers with advanced search options.
+        
+        Args:
+            query: Search query string
+            max_results: Maximum number of results
+            from_year: Filter papers from this year onwards
+            search_type: Type of search - 'all', 'title', 'author', 'journal', 'keywords'
+        """
         if not self.is_enabled():
             return []
         
-        print(f"[CrossRef] Searching for: {query}")
+        print(f"[CrossRef] Searching for: {query} (type: {search_type})")
         
         try:
             results = []
@@ -36,16 +45,16 @@ class CrossrefSource(BaseSource):
             
             while len(results) < max_results and start < 10000:
                 url = "https://api.crossref.org/works"
-                params = {
-                    'query': query,
-                    'rows': min(rows, max_results - len(results)),
-                    'offset': start,
-                    'sort': 'relevance',
-                    'order': 'desc'
-                }
+                
+                # Build query based on search type
+                params = self._build_query_params(query, search_type, rows, start, max_results - len(results))
                 
                 if from_year:
-                    params['filter'] = f'from-pub-date:{from_year}'
+                    existing_filter = params.get('filter', '')
+                    if existing_filter:
+                        params['filter'] = f'{existing_filter},from-pub-date:{from_year}'
+                    else:
+                        params['filter'] = f'from-pub-date:{from_year}'
                 
                 try:
                     response = self.make_request(url, params)
@@ -73,6 +82,30 @@ class CrossrefSource(BaseSource):
         except Exception as e:
             print(f"[CrossRef] Error: {e}")
             return []
+    
+    def _build_query_params(self, query: str, search_type: str, rows: int, offset: int, 
+                           max_remaining: int) -> Dict[str, Any]:
+        """Build query parameters based on search type."""
+        params = {
+            'rows': min(rows, max_remaining),
+            'offset': offset,
+            'sort': 'relevance',
+            'order': 'desc'
+        }
+        
+        # CrossRef API supports field-specific queries
+        if search_type == 'title':
+            params['query.title'] = query
+        elif search_type == 'author':
+            params['query.author'] = query
+        elif search_type == 'journal':
+            params['query.container-title'] = query
+        elif search_type == 'keywords':
+            params['query'] = query
+        else:  # 'all' or default
+            params['query'] = query
+        
+        return params
     
     def _parse_crossref_item(self, item: Dict[str, Any]) -> Optional[SearchResult]:
         """Parse a CrossRef API item into a SearchResult object."""

@@ -19,21 +19,57 @@ class Exporter:
         self.output_dir.mkdir(exist_ok=True)
     
     def export_to_csv(self, papers: List[Dict], filename: str = None) -> str:
-        """Export papers to CSV file"""
+        """Export papers to CSV file with improved structure"""
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"papers_{timestamp}.csv"
         
         filepath = self.output_dir / filename
         
+        # Create DataFrame
         df = pd.DataFrame(papers)
-        df.to_csv(filepath, index=False, encoding='utf-8-sig')
+        
+        # Reorder columns for better readability
+        preferred_columns = ['title', 'authors', 'publication_date', 'year', 
+                           'journal', 'citations', 'source', 'doi', 'url', 'abstract']
+        
+        # Extract year if not present
+        if 'year' not in df.columns and 'publication_date' in df.columns:
+            df['year'] = df['publication_date'].apply(self._extract_year)
+        
+        # Clean authors field - convert list to string
+        if 'authors' in df.columns:
+            df['authors'] = df['authors'].apply(
+                lambda x: '; '.join(x) if isinstance(x, list) else str(x)
+            )
+        
+        # Ensure all preferred columns exist
+        available_columns = [col for col in preferred_columns if col in df.columns]
+        other_columns = [col for col in df.columns if col not in preferred_columns]
+        
+        # Reorder
+        df = df[available_columns + other_columns]
+        
+        # Sort by citations (descending)
+        if 'citations' in df.columns:
+            df = df.sort_values('citations', ascending=False)
+        
+        # Add metadata header as comments
+        with open(filepath, 'w', encoding='utf-8-sig') as f:
+            f.write(f"# PaperLens Mini - Research Papers Export\n")
+            f.write(f"# Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"# Total Papers: {len(papers)}\n")
+            f.write(f"# Total Citations: {sum(p.get('citations', 0) for p in papers)}\n")
+            f.write(f"# \n")
+            
+            # Write the actual CSV data
+            df.to_csv(f, index=False)
         
         print(f"[OK] Exported to CSV: {filepath}")
         return str(filepath)
     
     def export_to_excel(self, papers: List[Dict], filename: str = None) -> str:
-        """Export papers to Excel file"""
+        """Export papers to Excel file with multiple sheets and analysis"""
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"papers_{timestamp}.xlsx"
@@ -41,36 +77,196 @@ class Exporter:
         filepath = self.output_dir / filename
         
         with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
-            # Papers sheet
-            df_papers = pd.DataFrame(papers)
-            df_papers.to_excel(writer, sheet_name='Papers', index=False)
+            # 1. Summary Sheet
+            total_papers = len(papers)
+            total_citations = sum(p.get('citations', 0) for p in papers)
+            avg_citations = total_citations / total_papers if total_papers > 0 else 0
             
-            # Summary statistics
+            # Extract years
+            years = [self._extract_year(p.get('publication_date')) for p in papers]
+            years = [y for y in years if y is not None]
+            year_range = f"{min(years)} - {max(years)}" if years else "N/A"
+            
             summary_data = {
-                'Total Papers': len(papers),
-                'Total Citations': sum(p.get('citations', 0) for p in papers),
-                'Average Citations': sum(p.get('citations', 0) for p in papers) / len(papers) if papers else 0,
-                'Unique Sources': len(set(p.get('source', '') for p in papers))
+                'Metric': [
+                    'Total Papers',
+                    'Total Citations',
+                    'Average Citations per Paper',
+                    'Median Citations',
+                    'Max Citations',
+                    'Year Range',
+                    'Unique Sources',
+                    'Papers with DOI',
+                    'Papers with Abstract',
+                    'Generated Date'
+                ],
+                'Value': [
+                    total_papers,
+                    total_citations,
+                    f'{avg_citations:.2f}',
+                    pd.DataFrame(papers)['citations'].median(),
+                    max((p.get('citations', 0) for p in papers), default=0),
+                    year_range,
+                    len(set(p.get('source', '') for p in papers)),
+                    sum(1 for p in papers if p.get('doi')),
+                    sum(1 for p in papers if p.get('abstract')),
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                ]
             }
-            df_summary = pd.DataFrame([summary_data])
+            df_summary = pd.DataFrame(summary_data)
             df_summary.to_excel(writer, sheet_name='Summary', index=False)
+            
+            # 2. All Papers Sheet
+            df_papers = pd.DataFrame(papers)
+            # Reorder columns for better readability
+            preferred_columns = ['title', 'authors', 'publication_date', 'journal', 
+                               'citations', 'source', 'doi', 'url', 'abstract']
+            available_columns = [col for col in preferred_columns if col in df_papers.columns]
+            other_columns = [col for col in df_papers.columns if col not in preferred_columns]
+            df_papers = df_papers[available_columns + other_columns]
+            df_papers.to_excel(writer, sheet_name='All Papers', index=False)
+            
+            # 3. Top Cited Papers
+            top_papers = sorted(papers, key=lambda x: x.get('citations', 0), reverse=True)[:20]
+            df_top = pd.DataFrame(top_papers)
+            if not df_top.empty:
+                df_top = df_top[available_columns]
+            df_top.to_excel(writer, sheet_name='Top 20 Cited', index=False)
+            
+            # 4. Papers by Year
+            if years:
+                from collections import Counter
+                year_counts = Counter(years)
+                df_years = pd.DataFrame([
+                    {'Year': year, 'Count': count, 'Percentage': f'{(count/len(years)*100):.1f}%'}
+                    for year, count in sorted(year_counts.items(), reverse=True)
+                ])
+                df_years.to_excel(writer, sheet_name='By Year', index=False)
+            
+            # 5. Papers by Source
+            df_source = pd.DataFrame(papers)
+            if 'source' in df_source.columns:
+                source_stats = df_source.groupby('source').agg({
+                    'title': 'count',
+                    'citations': ['sum', 'mean', 'median', 'max']
+                }).round(2)
+                source_stats.columns = ['Paper Count', 'Total Citations', 
+                                       'Avg Citations', 'Median Citations', 'Max Citations']
+                source_stats = source_stats.reset_index()
+                source_stats.to_excel(writer, sheet_name='By Source', index=False)
+            
+            # 6. Authors Analysis (Top 20 most frequent authors)
+            all_authors = []
+            for paper in papers:
+                authors = paper.get('authors', [])
+                if isinstance(authors, list):
+                    all_authors.extend(authors)
+            
+            if all_authors:
+                from collections import Counter
+                author_counts = Counter(all_authors).most_common(20)
+                df_authors = pd.DataFrame(author_counts, columns=['Author', 'Paper Count'])
+                df_authors.to_excel(writer, sheet_name='Top Authors', index=False)
+            
+            # 7. Journal Analysis (Top 20 journals)
+            journals = [p.get('journal', 'N/A') for p in papers if p.get('journal')]
+            if journals:
+                from collections import Counter
+                journal_counts = Counter(journals).most_common(20)
+                df_journals = pd.DataFrame(journal_counts, columns=['Journal', 'Paper Count'])
+                df_journals.to_excel(writer, sheet_name='Top Journals', index=False)
+            
+            # Format the worksheets
+            workbook = writer.book
+            
+            # Format Summary sheet
+            summary_sheet = workbook['Summary']
+            summary_sheet.column_dimensions['A'].width = 30
+            summary_sheet.column_dimensions['B'].width = 30
+            
+            # Format All Papers sheet
+            papers_sheet = workbook['All Papers']
+            papers_sheet.column_dimensions['A'].width = 50  # Title
+            papers_sheet.column_dimensions['B'].width = 40  # Authors
+            papers_sheet.column_dimensions['C'].width = 15  # Date
+            papers_sheet.column_dimensions['D'].width = 30  # Journal
         
         print(f"[OK] Exported to Excel: {filepath}")
         return str(filepath)
     
     def export_to_json(self, papers: List[Dict], filename: str = None) -> str:
-        """Export papers to JSON file"""
+        """Export papers to JSON file with comprehensive metadata"""
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"papers_{timestamp}.json"
         
         filepath = self.output_dir / filename
         
+        # Calculate statistics
+        total_papers = len(papers)
+        total_citations = sum(p.get('citations', 0) for p in papers)
+        avg_citations = total_citations / total_papers if total_papers > 0 else 0
+        
+        # Extract years
+        years = [self._extract_year(p.get('publication_date')) for p in papers]
+        years = [y for y in years if y is not None]
+        
+        # Source distribution
+        from collections import Counter
+        sources = Counter(p.get('source', 'Unknown') for p in papers)
+        
+        # Top cited papers
+        top_papers = sorted(papers, key=lambda x: x.get('citations', 0), reverse=True)[:10]
+        top_cited_titles = [
+            {
+                'title': p.get('title', 'N/A'),
+                'citations': p.get('citations', 0),
+                'year': self._extract_year(p.get('publication_date'))
+            }
+            for p in top_papers
+        ]
+        
+        # Authors statistics
+        all_authors = []
+        for paper in papers:
+            authors = paper.get('authors', [])
+            if isinstance(authors, list):
+                all_authors.extend(authors)
+        
+        top_authors = Counter(all_authors).most_common(10) if all_authors else []
+        
         export_data = {
             'metadata': {
+                'application': 'PaperLens Mini',
+                'version': '1.0.0',
                 'generated_at': datetime.now().isoformat(),
-                'total_papers': len(papers)
+                'generated_timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'export_format': 'JSON',
+                'data_sources': list(sources.keys())
             },
+            'statistics': {
+                'total_papers': total_papers,
+                'total_citations': total_citations,
+                'average_citations': round(avg_citations, 2),
+                'median_citations': int(pd.DataFrame(papers)['citations'].median()) if papers else 0,
+                'max_citations': max((p.get('citations', 0) for p in papers), default=0),
+                'year_range': {
+                    'min': min(years) if years else None,
+                    'max': max(years) if years else None,
+                    'span': f"{min(years)}-{max(years)}" if years else None
+                },
+                'papers_by_source': dict(sources),
+                'unique_sources': len(sources),
+                'papers_with_doi': sum(1 for p in papers if p.get('doi')),
+                'papers_with_abstract': sum(1 for p in papers if p.get('abstract')),
+                'papers_with_url': sum(1 for p in papers if p.get('url'))
+            },
+            'top_cited_papers': top_cited_titles,
+            'top_authors': [
+                {'author': author, 'paper_count': count}
+                for author, count in top_authors
+            ],
+            'year_distribution': dict(Counter(years)) if years else {},
             'papers': papers
         }
         
@@ -81,7 +277,7 @@ class Exporter:
         return str(filepath)
     
     def export_to_pdf(self, papers: List[Dict], filename: str = None) -> str:
-        """Export papers to PDF report"""
+        """Export papers to PDF report with comprehensive statistics"""
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"report_{timestamp}.pdf"
@@ -91,44 +287,69 @@ class Exporter:
         pdf = PDF()
         pdf.add_page()
         
-        # Title
-        pdf.set_font('Arial', 'B', 20)
-        pdf.cell(0, 10, 'Research Paper Report', 0, 1, 'C')
-        pdf.ln(5)
-        
-        # Date
-        pdf.set_font('Arial', '', 12)
-        pdf.cell(0, 10, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}', 0, 1, 'C')
+        # Title Page
+        pdf.set_font('Arial', 'B', 24)
+        pdf.cell(0, 20, 'PaperLens Mini', 0, 1, 'C')
+        pdf.set_font('Arial', 'B', 18)
+        pdf.cell(0, 10, 'Research Paper Analysis Report', 0, 1, 'C')
         pdf.ln(10)
         
-        # Summary statistics
-        pdf.set_font('Arial', 'B', 16)
-        pdf.cell(0, 10, '1. Summary Statistics', 0, 1)
+        # Date and metadata
         pdf.set_font('Arial', '', 12)
-        pdf.ln(3)
+        pdf.cell(0, 8, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', 0, 1, 'C')
+        pdf.cell(0, 8, f'Total Papers Analyzed: {len(papers)}', 0, 1, 'C')
+        pdf.ln(15)
+        
+        # Executive Summary Box
+        pdf.set_fill_color(240, 248, 255)
+        pdf.set_font('Arial', 'B', 14)
+        pdf.cell(0, 10, 'Executive Summary', 0, 1, 'L', True)
+        pdf.set_font('Arial', '', 11)
         
         total_papers = len(papers)
         total_citations = sum(p.get('citations', 0) for p in papers)
         avg_citations = total_citations / total_papers if total_papers > 0 else 0
         
-        pdf.cell(0, 8, f'Total Papers: {total_papers}', 0, 1)
-        pdf.cell(0, 8, f'Total Citations: {total_citations:,}', 0, 1)
-        pdf.cell(0, 8, f'Average Citations: {avg_citations:.2f}', 0, 1)
-        pdf.ln(10)
+        # Calculate additional statistics
+        df = pd.DataFrame(papers)
+        sources = df['source'].value_counts().to_dict()
         
-        # Papers list
-        pdf.add_page()
-        pdf.set_font('Arial', 'B', 16)
-        pdf.cell(0, 10, '2. Papers', 0, 1)
+        # Year statistics
+        years = [self._extract_year(p.get('publication_date')) for p in papers]
+        years = [y for y in years if y is not None]
+        year_range = f"{min(years)} - {max(years)}" if years else "N/A"
+        
+        # Top cited papers
+        top_papers = sorted(papers, key=lambda x: x.get('citations', 0), reverse=True)[:5]
+        
+        pdf.cell(0, 7, f'Total Papers: {total_papers}', 0, 1)
+        pdf.cell(0, 7, f'Total Citations: {total_citations:,}', 0, 1)
+        pdf.cell(0, 7, f'Average Citations per Paper: {avg_citations:.2f}', 0, 1)
+        pdf.cell(0, 7, f'Year Range: {year_range}', 0, 1)
         pdf.ln(5)
         
-        for i, paper in enumerate(papers[:50], 1):  # Limit to 50 papers
+        # Source breakdown
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(0, 7, 'Papers by Source:', 0, 1)
+        pdf.set_font('Arial', '', 11)
+        for source, count in sources.items():
+            percentage = (count / total_papers) * 100
+            pdf.cell(0, 6, f'  - {source}: {count} papers ({percentage:.1f}%)', 0, 1)
+        pdf.ln(10)
+        
+        # Top 10 Most Cited Papers
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        pdf.cell(0, 10, '1. Top 10 Most Cited Papers', 0, 1)
+        pdf.ln(3)
+        
+        for i, paper in enumerate(top_papers[:10], 1):
             pdf.set_font('Arial', 'B', 11)
-            title = paper.get('title', 'N/A')[:100]  # Limit title length
+            title = paper.get('title', 'N/A')[:100]
             pdf.multi_cell(0, 6, f'{i}. {title}')
             
             pdf.set_font('Arial', '', 10)
-            authors = ', '.join(paper.get('authors', [])[:3])  # Limit to 3 authors
+            authors = ', '.join(paper.get('authors', [])[:3])
             if len(paper.get('authors', [])) > 3:
                 authors += ' et al.'
             pdf.cell(0, 5, f'   Authors: {authors}', 0, 1)
@@ -136,17 +357,111 @@ class Exporter:
             year = paper.get('publication_date', 'N/A')
             citations = paper.get('citations', 0)
             source = paper.get('source', 'N/A')
-            pdf.cell(0, 5, f'   Year: {year}  |  Citations: {citations}  |  Source: {source}', 0, 1)
-            pdf.ln(3)
+            journal = paper.get('journal', 'N/A')
+            pdf.cell(0, 5, f'   Journal: {journal[:50]}', 0, 1)
+            pdf.cell(0, 5, f'   Year: {year}  |  Citations: {citations:,}  |  Source: {source}', 0, 1)
             
-            # Add new page every 10 papers
-            if i % 10 == 0 and i < len(papers):
+            if paper.get('doi'):
+                pdf.set_font('Arial', '', 9)
+                pdf.cell(0, 5, f'   DOI: {paper["doi"]}', 0, 1)
+            
+            pdf.ln(3)
+        
+        # Year Distribution Statistics
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        pdf.cell(0, 10, '2. Publications by Year', 0, 1)
+        pdf.ln(3)
+        
+        if years:
+            from collections import Counter
+            year_counts = Counter(years)
+            pdf.set_font('Arial', '', 11)
+            
+            for year in sorted(year_counts.keys(), reverse=True):
+                count = year_counts[year]
+                percentage = (count / len(years)) * 100
+                pdf.cell(0, 6, f'{year}: {count} papers ({percentage:.1f}%)', 0, 1)
+        else:
+            pdf.set_font('Arial', '', 11)
+            pdf.cell(0, 6, 'No year data available', 0, 1)
+        
+        pdf.ln(10)
+        
+        # Full Papers List
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        pdf.cell(0, 10, '3. Complete Papers List', 0, 1)
+        pdf.ln(5)
+        
+        for i, paper in enumerate(papers[:100], 1):  # Limit to 100 papers
+            pdf.set_font('Arial', 'B', 10)
+            title = paper.get('title', 'N/A')[:120]
+            pdf.multi_cell(0, 5, f'{i}. {title}')
+            
+            pdf.set_font('Arial', '', 9)
+            authors = ', '.join(paper.get('authors', [])[:4])
+            if len(paper.get('authors', [])) > 4:
+                authors += ' et al.'
+            pdf.cell(0, 4, f'   Authors: {authors[:100]}', 0, 1)
+            
+            year = paper.get('publication_date', 'N/A')
+            citations = paper.get('citations', 0)
+            source = paper.get('source', 'N/A')
+            pdf.cell(0, 4, f'   Year: {year}  |  Citations: {citations}  |  Source: {source}', 0, 1)
+            pdf.ln(2)
+            
+            # Add new page every 12 papers
+            if i % 12 == 0 and i < len(papers):
                 pdf.add_page()
+        
+        # Footer page
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 14)
+        pdf.cell(0, 10, 'About This Report', 0, 1)
+        pdf.set_font('Arial', '', 10)
+        pdf.ln(3)
+        
+        pdf.multi_cell(0, 5, 'This report was generated by PaperLens Mini, a lightweight research paper analysis tool.')
+        pdf.ln(3)
+        pdf.multi_cell(0, 5, 'Data Sources: CrossRef API, arXiv API')
+        pdf.ln(3)
+        pdf.multi_cell(0, 5, 'Note: Citation counts may vary depending on the source database and update frequency.')
+        pdf.ln(5)
+        pdf.set_font('Arial', 'I', 9)
+        pdf.multi_cell(0, 5, 'Disclaimer: This software is provided "as is" without warranty of any kind. The data accuracy depends on external sources.')
         
         pdf.output(str(filepath))
         
         print(f"[OK] Exported to PDF: {filepath}")
         return str(filepath)
+    
+    def _extract_year(self, date_str) -> int:
+        """Extract year from date string"""
+        if not date_str or pd.isna(date_str):
+            return None
+        
+        try:
+            date_str = str(date_str)
+            if '-' in date_str:
+                parts = date_str.split('-')
+                if parts[0].isdigit() and len(parts[0]) == 4:
+                    return int(parts[0])
+            elif '/' in date_str:
+                parts = date_str.split('/')
+                if parts[0].isdigit() and len(parts[0]) == 4:
+                    return int(parts[0])
+            elif date_str.isdigit() and len(date_str) == 4:
+                return int(date_str)
+            else:
+                import re
+                year_match = re.search(r'\b(19|20)\d{2}\b', date_str)
+                if year_match:
+                    return int(year_match.group())
+        except (ValueError, IndexError, AttributeError):
+            pass
+        
+        return None
 
 
 class PDF(FPDF):

@@ -190,6 +190,7 @@ function initSearchHandlers() {
 async function handleSearch() {
     const query = document.getElementById('search-query').value.trim();
     const source = document.getElementById('source-select').value;
+    const searchType = document.getElementById('search-type').value;
     const maxResults = parseInt(document.getElementById('max-results').value);
     const fromYear = document.getElementById('from-year').value;
     
@@ -203,11 +204,12 @@ async function handleSearch() {
     searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
     
     try {
-        console.log('[Search] Starting search:', { query, source, maxResults, fromYear });
+        console.log('[Search] Starting search:', { query, source, searchType, maxResults, fromYear });
         
         const params = {
             query: query,
             source: source,
+            search_type: searchType,
             max_results: maxResults,
             from_year: fromYear ? parseInt(fromYear) : null
         };
@@ -414,6 +416,7 @@ function displayVisualizations(vizData) {
     }
     
     const vizTypes = [
+        { key: 'wordcloud', id: 'viz-wordcloud', fallback: 'Word cloud not available' },
         { key: 'network', id: 'viz-network', fallback: 'Keyword network not available' },
         { key: 'years', id: 'viz-years', fallback: 'No year data available' },
         { key: 'citations', id: 'viz-citations', fallback: 'No citation data available' },

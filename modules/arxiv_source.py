@@ -22,12 +22,21 @@ class ArxivSource(BaseSource):
             "delay_between_requests": 3,
         }
     
-    def search(self, query: str, max_results: int = 100, from_year: Optional[int] = None) -> List[SearchResult]:
-        """Search arXiv for preprints and research papers."""
+    def search(self, query: str, max_results: int = 100, from_year: Optional[int] = None,
+               search_type: str = 'all') -> List[SearchResult]:
+        """
+        Search arXiv for preprints and research papers with advanced search options.
+        
+        Args:
+            query: Search query string
+            max_results: Maximum number of results
+            from_year: Filter papers from this year onwards
+            search_type: Type of search - 'all', 'title', 'author', 'journal', 'keywords'
+        """
         if not self.is_enabled():
             return []
         
-        print(f"[arXiv] Searching for: {query}")
+        print(f"[arXiv] Searching for: {query} (type: {search_type})")
         
         try:
             results = []
@@ -35,8 +44,12 @@ class ArxivSource(BaseSource):
             
             while len(results) < max_results:
                 url = "http://export.arxiv.org/api/query"
+                
+                # Build search query based on type
+                search_query = self._build_arxiv_query(query, search_type)
+                
                 params = {
-                    'search_query': f'all:{query}',
+                    'search_query': search_query,
                     'start': start,
                     'max_results': min(1000, max_results - len(results)),
                     'sortBy': 'relevance',
@@ -81,6 +94,28 @@ class ArxivSource(BaseSource):
         except Exception as e:
             print(f"[arXiv] Error: {e}")
             return []
+    
+    def _build_arxiv_query(self, query: str, search_type: str) -> str:
+        """
+        Build arXiv API search query based on search type.
+        
+        arXiv API search prefixes:
+        - ti: title
+        - au: author
+        - abs: abstract
+        - all: all fields
+        """
+        if search_type == 'title':
+            return f'ti:{query}'
+        elif search_type == 'author':
+            return f'au:{query}'
+        elif search_type == 'keywords':
+            return f'abs:{query}'
+        elif search_type == 'journal':
+            # arXiv doesn't have journal field, search in abstract instead
+            return f'abs:{query}'
+        else:  # 'all' or default
+            return f'all:{query}'
     
     def _parse_arxiv_entry(self, entry: ET.Element) -> Optional[SearchResult]:
         """Parse an arXiv XML entry into a SearchResult object."""

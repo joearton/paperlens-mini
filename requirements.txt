@@ -7,6 +7,7 @@ pywebview
 # HTTP Requests
 requests
 beautifulsoup4
+scholarly>=1.7.0
 
 # Data Processing
 pandas>=2.0.0
@@ -16,6 +17,7 @@ numpy>=1.24.0
 plotly>=5.18.0
 matplotlib>=3.8.0
 networkx>=3.0
+wordcloud>=1.9.0
 
 # Export
 openpyxl>=3.1.0

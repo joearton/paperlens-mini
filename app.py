@@ -35,6 +35,7 @@ class API:
             source = params.get('source', 'all')
             max_results = params.get('max_results', 50)
             from_year = params.get('from_year')
+            search_type = params.get('search_type', 'all')
             
             if not query:
                 return {
@@ -44,14 +45,15 @@ class API:
                 }
             
             print(f"\n[API] Searching for: {query}")
-            print(f"[API] Source: {source}, Max: {max_results}, Year: {from_year}")
+            print(f"[API] Source: {source}, Type: {search_type}, Max: {max_results}, Year: {from_year}")
             
             # Search papers
             papers = self.data_fetcher.search(
                 query=query,
                 source=source,
                 max_results=max_results,
-                from_year=from_year
+                from_year=from_year,
+                search_type=search_type
             )
             
             self.current_papers = papers
@@ -91,7 +93,12 @@ class API:
             keywords = self.keyword_extractor.extract_keywords(papers, top_n=20)
             print(f"[API] Extracted {len(keywords)} keywords: {keywords[:10]}")
             
-            # Keyword network (full width first)
+            # Word cloud (full width first)
+            viz_wordcloud = self.visualizer.create_wordcloud(papers)
+            visualizations['wordcloud'] = viz_wordcloud
+            print("[API] [OK] Word cloud created")
+            
+            # Keyword network (full width second)
             if keywords and len(keywords) >= 2:
                 viz_network = self.visualizer.create_keyword_network(keywords, papers)
                 visualizations['network'] = viz_network

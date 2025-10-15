@@ -17,6 +17,15 @@ except ImportError:
     NETWORKX_AVAILABLE = False
     print("[Viz] NetworkX not available - keyword network will be disabled")
 
+try:
+    from wordcloud import WordCloud
+    import io
+    import base64
+    WORDCLOUD_AVAILABLE = True
+except ImportError:
+    WORDCLOUD_AVAILABLE = False
+    print("[Viz] WordCloud not available - wordcloud visualization will be disabled")
+
 
 class Visualizer:
     """Create simple visualizations for research data"""
@@ -392,6 +401,103 @@ class Visualizer:
             
         except Exception as e:
             print(f"Error creating keyword network: {e}")
+            import traceback
+            traceback.print_exc()
+            return self._create_empty_chart(f"Error: {e}")
+    
+    def create_wordcloud(self, papers: List[Dict]) -> str:
+        """
+        Create word cloud visualization from paper titles and abstracts.
+        
+        Args:
+            papers: List of papers to extract text from
+            
+        Returns:
+            HTML string with embedded image
+        """
+        if not WORDCLOUD_AVAILABLE:
+            return self._create_empty_chart("WordCloud library not installed")
+        
+        try:
+            if not papers:
+                return self._create_empty_chart("No papers available for word cloud")
+            
+            # Collect text from titles and abstracts
+            text_data = []
+            for paper in papers:
+                if paper.get('title'):
+                    text_data.append(paper['title'])
+                if paper.get('abstract'):
+                    # Limit abstract to first 200 chars to avoid dominance
+                    abstract = paper['abstract'][:200]
+                    text_data.append(abstract)
+            
+            if not text_data:
+                return self._create_empty_chart("No text data available for word cloud")
+            
+            # Combine all text
+            combined_text = ' '.join(text_data)
+            
+            # Common stopwords for academic papers
+            stopwords = set([
+                'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+                'of', 'with', 'from', 'by', 'as', 'is', 'was', 'are', 'were', 'been',
+                'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
+                'should', 'could', 'may', 'might', 'can', 'this', 'that', 'these',
+                'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'what', 'which',
+                'who', 'when', 'where', 'why', 'how', 'all', 'each', 'every', 'both',
+                'few', 'more', 'most', 'other', 'some', 'such', 'only', 'own', 'same',
+                'so', 'than', 'too', 'very', 'also', 'however', 'therefore', 'thus',
+                'furthermore', 'moreover', 'nevertheless', 'using', 'used', 'study',
+                'paper', 'research', 'results', 'method', 'approach', 'based'
+            ])
+            
+            # Generate word cloud
+            wc = WordCloud(
+                width=900,
+                height=500,
+                background_color='white',
+                stopwords=stopwords,
+                max_words=100,
+                relative_scaling=0.5,
+                colormap='viridis',
+                min_font_size=10
+            ).generate(combined_text)
+            
+            # Convert to image
+            import matplotlib
+            matplotlib.use('Agg')  # Use non-interactive backend
+            import matplotlib.pyplot as plt
+            
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.imshow(wc, interpolation='bilinear')
+            ax.axis('off')
+            ax.set_title('Word Cloud from Paper Titles & Abstracts', 
+                        fontsize=16, fontweight='bold', pad=20)
+            
+            # Save to bytes
+            buf = io.BytesIO()
+            plt.tight_layout(pad=1)
+            plt.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+            plt.close(fig)
+            buf.seek(0)
+            
+            # Encode to base64
+            img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+            
+            # Create HTML with embedded image
+            html = f'''
+            <div style="text-align: center; padding: 20px;">
+                <img src="data:image/png;base64,{img_base64}" 
+                     style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
+                     alt="Word Cloud">
+            </div>
+            '''
+            
+            return html
+            
+        except Exception as e:
+            print(f"Error creating word cloud: {e}")
             import traceback
             traceback.print_exc()
             return self._create_empty_chart(f"Error: {e}")

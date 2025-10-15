@@ -116,12 +116,23 @@
                     
                     <div class="search-options">
                         <div class="option-group">
+                            <label><i class="fas fa-search"></i> Search Type:</label>
+                            <select id="search-type" class="form-control">
+                                <option value="all">All Fields</option>
+                                <option value="title">Title</option>
+                                <option value="author">Author</option>
+                                <option value="journal">Journal/Publication</option>
+                                <option value="keywords">Keywords</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-group">
                             <label><i class="fas fa-database"></i> Data Source:</label>
                             <select id="source-select" class="form-control">
                                 <option value="all">All Sources</option>
                                 <option value="crossref">CrossRef</option>
                                 <option value="arxiv">arXiv</option>
-                                <option value="scholar" disabled>Google Scholar (coming soon)</option>
+                                <option value="scholar">Google Scholar</option>
                             </select>
                         </div>
                         
@@ -185,6 +196,14 @@
                 <div id="viz-status" class="status-message"></div>
                 
                 <div class="visualizations">
+                    <!-- Word Cloud - Full Width -->
+                    <div class="viz-section full-width card">
+                        <h3><i class="fas fa-cloud"></i> Word Cloud</h3>
+                        <div id="viz-wordcloud" class="viz-container">
+                            <p style="text-align: center; padding: 40px; color: #999;">Click "Generate All Visualizations" button above</p>
+                        </div>
+                    </div>
+                    
                     <!-- Keyword Network - Full Width -->
                     <div class="viz-section full-width card">
                         <h3><i class="fas fa-project-diagram"></i> Keyword Network</h3>
@@ -297,12 +316,20 @@
             <div class="modal-body">
                 <div class="help-section">
                     <h3><i class="fas fa-search"></i> Step 1: Search Papers</h3>
-                    <p>Find academic papers from online databases.</p>
+                    <p>Find academic papers from online databases with advanced search options.</p>
                     <ul>
+                        <li><strong>Search Type:</strong> Choose All Fields, Title, Author, Journal, or Keywords</li>
                         <li><strong>Keywords:</strong> Enter specific research terms</li>
-                        <li><strong>Source:</strong> Choose All Sources, CrossRef, or arXiv</li>
-                        <li><strong>Max Results:</strong> Default 300 papers</li>
+                        <li><strong>Source:</strong> Choose All Sources, CrossRef, arXiv, or Google Scholar</li>
+                        <li><strong>Max Results:</strong> Default 300 papers (Google Scholar limited to 100)</li>
                         <li><strong>From Year:</strong> Auto-set to 3 years ago</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Search Type Examples:</strong></p>
+                    <ul style="font-size: 0.9em;">
+                        <li><em>Title:</em> Search only in paper titles</li>
+                        <li><em>Author:</em> Find papers by specific authors (e.g., "John Smith")</li>
+                        <li><em>Journal:</em> Search in specific journals or publications</li>
+                        <li><em>Keywords:</em> Search using abstract keywords</li>
                     </ul>
                 </div>
                 
@@ -310,6 +337,7 @@
                     <h3><i class="fas fa-chart-line"></i> Step 2: Visualize</h3>
                     <p>View interactive charts and graphs.</p>
                     <ul>
+                        <li><strong>Word Cloud:</strong> Visual representation of frequent terms in papers</li>
                         <li><strong>Keyword Network:</strong> Interactive graph showing keyword relationships</li>
                         <li><strong>Publications per Year:</strong> Track publication trends</li>
                         <li><strong>Citation Distribution:</strong> Understand paper impact</li>
@@ -358,9 +386,10 @@
                     <div class="about-features">
                         <h4><i class="fas fa-star"></i> Key Features</h4>
                         <ul>
-                            <li><i class="fas fa-check"></i> Multi-source paper search (CrossRef, arXiv)</li>
-                            <li><i class="fas fa-check"></i> 5 Interactive visualizations (keyword network + 4 charts)</li>
-                            <li><i class="fas fa-check"></i> Export to multiple formats</li>
+                            <li><i class="fas fa-check"></i> Multi-source paper search (CrossRef, arXiv, Google Scholar)</li>
+                            <li><i class="fas fa-check"></i> Advanced search by Title, Author, Journal, or Keywords</li>
+                            <li><i class="fas fa-check"></i> 6 Interactive visualizations (word cloud, keyword network + 4 charts)</li>
+                            <li><i class="fas fa-check"></i> Export to multiple formats (PDF, Excel, CSV, JSON)</li>
                             <li><i class="fas fa-check"></i> Dark mode with persistence</li>
                             <li><i class="fas fa-check"></i> Lightweight (~50MB vs 2GB)</li>
                         </ul>
@@ -368,15 +397,26 @@
                     
                     <div class="about-tech">
                         <h4><i class="fas fa-cogs"></i> Technology</h4>
-                        <p><strong>Backend:</strong> Python, Plotly, Pandas</p>
+                        <p><strong>Backend:</strong> Python, Plotly, Pandas, Scholarly</p>
                         <p><strong>Frontend:</strong> HTML5, CSS3, JavaScript</p>
                         <p><strong>Framework:</strong> PyWebview</p>
-                        <p><strong>Sources:</strong> CrossRef API, arXiv API</p>
+                        <p><strong>Sources:</strong> CrossRef API, arXiv API, Google Scholar</p>
                     </div>
                     
                     <div class="about-note">
                         <h4><i class="fas fa-lightbulb"></i> Note</h4>
                         <p>This is the simplified version without AI/ML models. For advanced features like NLP analysis, research gap detection, and RAG Q&A, use the full <strong>PaperLens</strong> version.</p>
+                    </div>
+                    
+                    <div class="about-license">
+                        <h4><i class="fas fa-balance-scale"></i> License & Warranty</h4>
+                        <p><strong>License:</strong> MIT License - Free to use for academic and commercial purposes</p>
+                        <p style="margin-top: 10px; padding: 15px; background: #f8f9fa; border-left: 4px solid #e74c3c; font-size: 0.9em; line-height: 1.6;">
+                            <strong>NO WARRANTY:</strong> This software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use or other dealings in the software.
+                        </p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                            The data retrieved from external sources (CrossRef, arXiv) is provided by those services and their respective terms apply. This application does not guarantee the accuracy, completeness, or reliability of the data.
+                        </p>
                     </div>
                 </div>
             </div>

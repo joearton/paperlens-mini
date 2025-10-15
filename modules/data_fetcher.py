@@ -23,22 +23,23 @@ class DataFetcher:
         }
     
     def search(self, query: str, source: str = 'all', max_results: int = 100, 
-               from_year: Optional[int] = None) -> List[Dict[str, Any]]:
+               from_year: Optional[int] = None, search_type: str = 'all') -> List[Dict[str, Any]]:
         """
         Search for academic papers.
         
         Args:
             query: Search query string
-            source: Source to search ('all', 'crossref', 'arxiv')
+            source: Source to search ('all', 'crossref', 'arxiv', 'scholar')
             max_results: Maximum number of results
             from_year: Filter papers from this year onwards
+            search_type: Type of search - 'all', 'title', 'author', 'journal', 'keywords'
             
         Returns:
             List of paper dictionaries
         """
         print(f"\n{'='*60}")
         print(f"Searching for: {query}")
-        print(f"Source: {source} | Max results: {max_results} | From year: {from_year or 'Any'}")
+        print(f"Source: {source} | Type: {search_type} | Max results: {max_results} | From year: {from_year or 'Any'}")
         print(f"{'='*60}\n")
         
         results = []
@@ -53,7 +54,7 @@ class DataFetcher:
             
             with ThreadPoolExecutor(max_workers=2) as executor:
                 future_to_source = {
-                    executor.submit(self._search_source, src_name, query, max_per_source, from_year): src_name
+                    executor.submit(self._search_source, src_name, query, max_per_source, from_year, search_type): src_name
                     for src_name in self.sources.keys()
                 }
                 
@@ -69,7 +70,7 @@ class DataFetcher:
         else:
             # Search specific source
             if source in self.sources:
-                results = self._search_source(source, query, max_results, from_year)
+                results = self._search_source(source, query, max_results, from_year, search_type)
                 print(f"[OK] {source}: {len(results)} papers")
             else:
                 print(f"[ERROR] Unknown source: {source}")
@@ -89,11 +90,11 @@ class DataFetcher:
         return unique_results
     
     def _search_source(self, source_name: str, query: str, max_results: int, 
-                       from_year: Optional[int]) -> List[Dict[str, Any]]:
+                       from_year: Optional[int], search_type: str = 'all') -> List[Dict[str, Any]]:
         """Search a single source."""
         try:
             source = self.sources[source_name]
-            search_results = source.search(query, max_results, from_year)
+            search_results = source.search(query, max_results, from_year, search_type)
             
             # Convert SearchResult objects to dictionaries
             papers = []

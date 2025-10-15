@@ -45,8 +45,17 @@ class BaseSource(ABC):
         pass
     
     @abstractmethod
-    def search(self, query: str, max_results: int = 100, from_year: Optional[int] = None) -> List[SearchResult]:
-        """Search for papers in this data source."""
+    def search(self, query: str, max_results: int = 100, from_year: Optional[int] = None, 
+               search_type: str = 'all') -> List[SearchResult]:
+        """
+        Search for papers in this data source.
+        
+        Args:
+            query: Search query string
+            max_results: Maximum number of results
+            from_year: Filter papers from this year onwards
+            search_type: Type of search - 'all', 'title', 'author', 'journal', 'keywords'
+        """
         pass
     
     def is_enabled(self) -> bool:
