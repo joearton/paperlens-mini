@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperLens Mini</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    
+    <!-- Preload logo -->
+    <link rel="preload" href="images/logo-with-text.png" as="image">
+    
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    
+    <script>
+        // Check if Plotly is loaded
+        window.addEventListener('load', () => {
+            if (typeof Plotly !== 'undefined') {
+                console.log('✓ Plotly.js loaded successfully, version:', Plotly.version);
+            } else {
+                console.error('✗ Plotly.js failed to load!');
+            }
+        });
+    </script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i class="fas fa-book-open" style="font-size: 3em; color: #3498db;"></i>
+                <h2 style="margin-top: 20px;">PaperLens Mini</h2>
+            </div>
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <div class="loading-text">
+                <h3>Loading Application...</h3>
+                <p id="loading-status">Initializing...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="main-container" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="images/logo-with-text.png" alt="PaperLens Logo" class="logo-image">
+            </div>
+            
+            <!-- Wizard Steps -->
+            <div class="wizard-steps">
+                <div class="wizard-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-info">
+                        <div class="step-title">Search</div>
+                        <div class="step-desc">Find papers</div>
+                    </div>
+                </div>
+                <div class="wizard-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-info">
+                        <div class="step-title">Visualize</div>
+                        <div class="step-desc">View charts</div>
+                    </div>
+                </div>
+                <div class="wizard-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-info">
+                        <div class="step-title">Export</div>
+                        <div class="step-desc">Save results</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="sidebar-actions">
+                    <button class="sidebar-action-btn" onclick="showHelp()" title="Help (F1)">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                    <button class="sidebar-action-btn" onclick="showAbout()" title="About">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button class="sidebar-action-btn" onclick="toggleDarkMode()" title="Dark Mode">
+                        <i class="fas fa-moon" id="darkmode-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Search Page (Step 1) -->
+            <div id="search-page" class="page active">
+                <div class="page-header">
+                    <h1><i class="fas fa-search"></i> Step 1: Search Academic Literature</h1>
+                    <p class="page-subtitle">Start by finding relevant research papers</p>
+                </div>
+                
+                <div class="search-section card">
+                    <h3><i class="fas fa-globe"></i> Online Search</h3>
+                    <div class="search-box">
+                        <input type="text" id="search-query" placeholder="e.g., machine learning healthcare..." />
+                        <button id="search-btn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    
+                    <div class="search-options">
+                        <div class="option-group">
+                            <label><i class="fas fa-database"></i> Data Source:</label>
+                            <select id="source-select" class="form-control">
+                                <option value="all">All Sources</option>
+                                <option value="crossref">CrossRef</option>
+                                <option value="arxiv">arXiv</option>
+                                <option value="scholar" disabled>Google Scholar (coming soon)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-row">
+                            <div class="option-group">
+                                <label><i class="fas fa-list-ol"></i> Max Results:</label>
+                                <input type="number" id="max-results" class="form-control" value="300" min="10" max="1000" />
+                            </div>
+                            
+                            <div class="option-group">
+                                <label><i class="fas fa-calendar"></i> From Year:</label>
+                                <input type="number" id="from-year" class="form-control" min="1900" max="2030" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="search-status" class="status-message"></div>
+                
+                <!-- Papers List -->
+                <div id="papers-list" class="papers-container">
+                    <div id="search-placeholder" class="search-placeholder">
+                        <div class="placeholder-content">
+                            <div class="placeholder-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>Enter keywords to start searching</h3>
+                            <p>Use the search box above to find relevant research papers from academic databases.</p>
+                            <div class="placeholder-features">
+                                <div class="feature-item">
+                                    <i class="fas fa-database"></i>
+                                    <span>2 Data Sources</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Basic Visualizations</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-download"></i>
+                                    <span>Export Options</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Page (Step 2) -->
+            <div id="visualization-page" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-chart-line"></i> Step 2: Data Visualizations</h1>
+                    <p class="page-subtitle">Interactive charts and graphs</p>
+                </div>
+                
+                <div class="viz-controls">
+                    <button id="generate-viz" class="btn btn-primary btn-lg">
+                        <i class="fas fa-chart-pie"></i> Generate All Visualizations
+                    </button>
+                </div>
+                
+                <div id="viz-status" class="status-message"></div>
+                
+                <div class="visualizations">
+                    <!-- Keyword Network - Full Width -->
+                    <div class="viz-section full-width card">
+                        <h3><i class="fas fa-project-diagram"></i> Keyword Network</h3>
+                        <div id="viz-network" class="viz-container">
+                            <p style="text-align: center; padding: 40px; color: #999;">Click "Generate All Visualizations" button above</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Second Row - 2 Columns -->
+                    <div class="viz-section card">
+                        <h3><i class="fas fa-chart-bar"></i> Publications per Year</h3>
+                        <div id="viz-years" class="viz-container">
+                            <p style="text-align: center; padding: 40px; color: #999;">Click "Generate All Visualizations" button above</p>
+                        </div>
+                    </div>
+                    
+                    <div class="viz-section card">
+                        <h3><i class="fas fa-chart-area"></i> Citation Distribution</h3>
+                        <div id="viz-citations" class="viz-container">
+                            <p style="text-align: center; padding: 40px; color: #999;">Click "Generate All Visualizations" button above</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Third Row - 2 Columns -->
+                    <div class="viz-section card">
+                        <h3><i class="fas fa-clock"></i> Timeline View</h3>
+                        <div id="viz-timeline" class="viz-container">
+                            <p style="text-align: center; padding: 40px; color: #999;">Click "Generate All Visualizations" button above</p>
+                        </div>
+                    </div>
+                    
+                    <div class="viz-section card">
+                        <h3><i class="fas fa-pie-chart"></i> Papers by Source</h3>
+                        <div id="viz-sources" class="viz-container">
+                            <p style="text-align: center; padding: 40px; color: #999;">Click "Generate All Visualizations" button above</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Page (Step 3) -->
+            <div id="export-page" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-download"></i> Step 3: Export Results</h1>
+                    <p class="page-subtitle">Save your analysis in various formats</p>
+                </div>
+                
+                <div class="export-section">
+                    <div class="export-options">
+                        <div class="export-card card">
+                            <i class="fas fa-file-pdf export-icon"></i>
+                            <h3>PDF Report</h3>
+                            <p>Complete analysis report</p>
+                            <button class="btn btn-primary export-btn" data-format="pdf">
+                                <i class="fas fa-download"></i> Export to PDF
+                            </button>
+                        </div>
+                        
+                        <div class="export-card card">
+                            <i class="fas fa-file-excel export-icon"></i>
+                            <h3>Excel Spreadsheet</h3>
+                            <p>Papers data in Excel format</p>
+                            <button class="btn btn-primary export-btn" data-format="excel">
+                                <i class="fas fa-download"></i> Export to Excel
+                            </button>
+                        </div>
+                        
+                        <div class="export-card card">
+                            <i class="fas fa-file-csv export-icon"></i>
+                            <h3>CSV File</h3>
+                            <p>Raw paper data in CSV format</p>
+                            <button class="btn btn-primary export-btn" data-format="csv">
+                                <i class="fas fa-download"></i> Export to CSV
+                            </button>
+                        </div>
+                        
+                        <div class="export-card card">
+                            <i class="fas fa-code export-icon"></i>
+                            <h3>JSON Data</h3>
+                            <p>Complete data in JSON format</p>
+                            <button class="btn btn-primary export-btn" data-format="json">
+                                <i class="fas fa-download"></i> Export to JSON
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="export-status" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fixed Top-Right Navigation -->
+        <div class="fixed-navigation" id="fixed-nav" style="display: none;">
+            <button class="btn btn-secondary btn-nav" id="back-btn" onclick="goToPreviousStep()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button class="btn btn-success btn-nav" id="next-btn" onclick="goToNextStep()">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-question-circle"></i> Help</h2>
+                <span class="close" onclick="closeModal('help-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h3><i class="fas fa-search"></i> Step 1: Search Papers</h3>
+                    <p>Find academic papers from online databases.</p>
+                    <ul>
+                        <li><strong>Keywords:</strong> Enter specific research terms</li>
+                        <li><strong>Source:</strong> Choose All Sources, CrossRef, or arXiv</li>
+                        <li><strong>Max Results:</strong> Default 300 papers</li>
+                        <li><strong>From Year:</strong> Auto-set to 3 years ago</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3><i class="fas fa-chart-line"></i> Step 2: Visualize</h3>
+                    <p>View interactive charts and graphs.</p>
+                    <ul>
+                        <li><strong>Keyword Network:</strong> Interactive graph showing keyword relationships</li>
+                        <li><strong>Publications per Year:</strong> Track publication trends</li>
+                        <li><strong>Citation Distribution:</strong> Understand paper impact</li>
+                        <li><strong>Timeline:</strong> See papers over time</li>
+                        <li><strong>Source Distribution:</strong> Papers by database</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3><i class="fas fa-download"></i> Step 3: Export</h3>
+                    <p>Save your results in various formats.</p>
+                    <ul>
+                        <li><strong>PDF:</strong> Professional report</li>
+                        <li><strong>Excel:</strong> Multiple sheets with summary</li>
+                        <li><strong>CSV:</strong> Raw data for analysis</li>
+                        <li><strong>JSON:</strong> Complete data structure</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> About PaperLens Mini</h2>
+                <span class="close" onclick="closeModal('about-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="about-content">
+                    <div class="about-logo">
+                        <i class="fas fa-book-open" style="font-size: 3em; color: #3498db;"></i>
+                        <h2 style="margin-top: 15px;">PaperLens Mini</h2>
+                        <p class="about-slogan">Simple Research Paper Analyzer</p>
+                    </div>
+                    
+                    <div class="about-info">
+                        <h4><i class="fas fa-code"></i> Developed by ArtonLabs</h4>
+                        <p><strong>Developer:</strong> Hartono</p>
+                        <p><strong>Website:</strong> <a href="https://www.artonlabs.com" target="_blank">www.artonlabs.com</a></p>
+                        <p><strong>Version:</strong> 1.0.0 Mini</p>
+                        <p><strong>Build:</strong> October 2025</p>
+                    </div>
+                    
+                    <div class="about-features">
+                        <h4><i class="fas fa-star"></i> Key Features</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Multi-source paper search (CrossRef, arXiv)</li>
+                            <li><i class="fas fa-check"></i> 5 Interactive visualizations (keyword network + 4 charts)</li>
+                            <li><i class="fas fa-check"></i> Export to multiple formats</li>
+                            <li><i class="fas fa-check"></i> Dark mode with persistence</li>
+                            <li><i class="fas fa-check"></i> Lightweight (~50MB vs 2GB)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="about-tech">
+                        <h4><i class="fas fa-cogs"></i> Technology</h4>
+                        <p><strong>Backend:</strong> Python, Plotly, Pandas</p>
+                        <p><strong>Frontend:</strong> HTML5, CSS3, JavaScript</p>
+                        <p><strong>Framework:</strong> PyWebview</p>
+                        <p><strong>Sources:</strong> CrossRef API, arXiv API</p>
+                    </div>
+                    
+                    <div class="about-note">
+                        <h4><i class="fas fa-lightbulb"></i> Note</h4>
+                        <p>This is the simplified version without AI/ML models. For advanced features like NLP analysis, research gap detection, and RAG Q&A, use the full <strong>PaperLens</strong> version.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" class="scroll-to-top-btn" onclick="scrollToTop()" title="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
