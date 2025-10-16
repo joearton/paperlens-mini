@@ -7,6 +7,7 @@ import webview
 from pathlib import Path
 from typing import Dict, List, Any
 import json
+import traceback
 import config
 
 # Import modules
@@ -165,14 +166,22 @@ class API:
                 authors = paper.get('authors', [])
                 if isinstance(authors, list):
                     for author in authors:
+                        author_name = ''
+                        author_affiliation = ''
+                        
+                        # Handle both string and dict formats
                         if isinstance(author, dict):
                             author_name = author.get('name', '').strip()
-                            if author_name:
-                                all_authors.append({
-                                    'name': author_name,
-                                    'affiliation': author.get('affiliation', ''),
-                                    'paper_title': paper.get('title', '')
-                                })
+                            author_affiliation = author.get('affiliation', '')
+                        elif isinstance(author, str):
+                            author_name = author.strip()
+                        
+                        if author_name:
+                            all_authors.append({
+                                'name': author_name,
+                                'affiliation': author_affiliation,
+                                'paper_title': paper.get('title', '')
+                            })
                 
                 # Extract year
                 year = paper.get('year')

@@ -859,15 +859,25 @@ function displayStatistics(stats) {
     if (stats.top_authors && stats.top_authors.length > 0) {
         topAuthorsList.innerHTML = stats.top_authors.map((author, index) => {
             const rankClass = index < 3 ? `rank-${index + 1}` : '';
+            const papersList = author.papers && author.papers.length > 0 ? 
+                author.papers.slice(0, 3).map(paper => `<div class="paper-title">${escapeHtml(paper)}</div>`).join('') +
+                (author.papers.length > 3 ? `<div class="paper-title more">... and ${author.papers.length - 3} more</div>` : '') :
+                '<div class="paper-title no-papers">No paper titles available</div>';
+            
             return `
                 <div class="author-item ${rankClass}">
-                    <div class="author-info">
-                        <div class="author-name">${author.name}</div>
-                        <div class="author-affiliation">${author.affiliation || 'No affiliation'}</div>
+                    <div class="author-header">
+                        <div class="author-info">
+                            <div class="author-name">${author.name}</div>
+                            <div class="author-affiliation">${author.affiliation || 'No affiliation'}</div>
+                        </div>
+                        <div class="author-stats">
+                            <div class="author-paper-count">${author.paper_count}</div>
+                            <div class="author-paper-label">paper${author.paper_count !== 1 ? 's' : ''}</div>
+                        </div>
                     </div>
-                    <div class="author-stats">
-                        <div class="author-paper-count">${author.paper_count}</div>
-                        <div class="author-paper-label">paper${author.paper_count !== 1 ? 's' : ''}</div>
+                    <div class="author-papers">
+                        ${papersList}
                     </div>
                 </div>
             `;
