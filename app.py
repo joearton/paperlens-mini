@@ -15,6 +15,9 @@ from modules.visualizer import Visualizer
 from modules.exporter import Exporter
 from modules.keyword_extractor import KeywordExtractor
 
+# Application version
+APP_VERSION = "1.0.0"
+
 
 class API:
     """API class for communication between frontend and backend"""
@@ -137,6 +140,110 @@ class API:
                 'visualizations': {}
             }
     
+    def get_paper_statistics(self, papers: List[Dict]) -> Dict:
+        """Get statistics about the papers including author analysis"""
+        try:
+            if not papers:
+                return {
+                    'success': False,
+                    'error': 'No papers to analyze',
+                    'statistics': {}
+                }
+            
+            print(f"[API] Analyzing statistics for {len(papers)} papers")
+            
+            # Basic statistics
+            total_papers = len(papers)
+            
+            # Collect all authors
+            all_authors = []
+            years = []
+            sources = set()
+            
+            for paper in papers:
+                # Extract authors
+                authors = paper.get('authors', [])
+                if isinstance(authors, list):
+                    for author in authors:
+                        if isinstance(author, dict):
+                            author_name = author.get('name', '').strip()
+                            if author_name:
+                                all_authors.append({
+                                    'name': author_name,
+                                    'affiliation': author.get('affiliation', ''),
+                                    'paper_title': paper.get('title', '')
+                                })
+                
+                # Extract year
+                year = paper.get('year')
+                if year and isinstance(year, (int, str)):
+                    try:
+                        year_int = int(str(year))
+                        if 1900 <= year_int <= 2030:
+                            years.append(year_int)
+                    except (ValueError, TypeError):
+                        pass
+                
+                # Extract source
+                source = paper.get('source', '')
+                if source:
+                    sources.add(source)
+            
+            # Count unique authors
+            unique_authors = {}
+            for author in all_authors:
+                name = author['name']
+                if name not in unique_authors:
+                    unique_authors[name] = {
+                        'name': name,
+                        'affiliation': author['affiliation'],
+                        'paper_count': 0,
+                        'papers': []
+                    }
+                unique_authors[name]['paper_count'] += 1
+                unique_authors[name]['papers'].append(author['paper_title'])
+            
+            # Get top 5 authors
+            top_authors = sorted(
+                unique_authors.values(),
+                key=lambda x: x['paper_count'],
+                reverse=True
+            )[:5]
+            
+            # Year range
+            year_range = "-"
+            if years:
+                min_year = min(years)
+                max_year = max(years)
+                if min_year == max_year:
+                    year_range = str(min_year)
+                else:
+                    year_range = f"{min_year}-{max_year}"
+            
+            statistics = {
+                'total_papers': total_papers,
+                'total_authors': len(unique_authors),
+                'year_range': year_range,
+                'data_sources': len(sources),
+                'top_authors': top_authors
+            }
+            
+            print(f"[API] [OK] Statistics calculated: {total_papers} papers, {len(unique_authors)} authors")
+            
+            return {
+                'success': True,
+                'statistics': statistics
+            }
+            
+        except Exception as e:
+            print(f"[API] Error in get_paper_statistics: {e}")
+            traceback.print_exc()
+            return {
+                'success': False,
+                'error': str(e),
+                'statistics': {}
+            }
+    
     def export_data(self, format: str, papers: List[Dict]) -> Dict:
         """Export data to various formats"""
         try:
@@ -173,6 +280,55 @@ class API:
             print(f"[API] Error exporting data: {e}")
             import traceback
             traceback.print_exc()
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def open_file_manager(self, filepath: str) -> Dict:
+        """Open file manager to show exported file"""
+        try:
+            success = self.exporter.open_file_manager(filepath)
+            return {
+                'success': success,
+                'message': 'File manager opened' if success else 'Failed to open file manager'
+            }
+        except Exception as e:
+            print(f"[API] Error opening file manager: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def open_file(self, filepath: str) -> Dict:
+        """Open exported file directly with default application"""
+        try:
+            success = self.exporter.open_file(filepath)
+            return {
+                'success': success,
+                'message': 'File opened successfully' if success else 'Failed to open file'
+            }
+        except Exception as e:
+            print(f"[API] Error opening file: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def get_app_info(self) -> Dict:
+        """Get application information including version"""
+        try:
+            return {
+                'success': True,
+                'app_info': {
+                    'name': 'PaperLens Mini',
+                    'version': APP_VERSION,
+                    'description': 'Academic Paper Search and Analysis Tool',
+                    'author': 'PaperLens Team'
+                }
+            }
+        except Exception as e:
+            print(f"[API] Error getting app info: {e}")
             return {
                 'success': False,
                 'error': str(e)
@@ -218,7 +374,7 @@ def main():
     )
     
     print("[App] Starting PaperLens Mini...")
-    webview.start(debug=False)
+    webview.start(debug=True)
 
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@
 // Global state
 let currentPapers = [];
 let currentStep = 1;
+let searchHistory = [];
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,7 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initWizard();
     initSearchHandlers();
     initVisualizationHandlers();
+    initSearchHistory();
     initExportHandlers();
+    loadAppInfo();
     
     // Load dark mode preference
     loadDarkMode();
@@ -109,6 +112,11 @@ function goToStep(step) {
     
     updateWizardSteps();
     updateFixedNavigation();
+    
+    // Update statistics when entering export page
+    if (step === 3) {
+        updateStatistics();
+    }
     
     // Scroll to top
     document.querySelector('.main-content').scrollTop = 0;
@@ -194,8 +202,25 @@ async function handleSearch() {
     const maxResults = parseInt(document.getElementById('max-results').value);
     const fromYear = document.getElementById('from-year').value;
     
+    // Clear previous status
+    showStatus('search-status', '', '');
+    
+    // Validate form inputs
     if (!query) {
         showStatus('search-status', 'Please enter search keywords', 'error');
+        document.getElementById('search-query').focus();
+        return;
+    }
+    
+    if (isNaN(maxResults) || maxResults < 10 || maxResults > 1000) {
+        showStatus('search-status', 'Max Results must be between 10 and 1000', 'error');
+        document.getElementById('max-results').focus();
+        return;
+    }
+    
+    if (fromYear && (isNaN(fromYear) || fromYear < 1900 || fromYear > 2030)) {
+        showStatus('search-status', 'From Year must be between 1900 and 2030', 'error');
+        document.getElementById('from-year').focus();
         return;
     }
     
@@ -220,6 +245,9 @@ async function handleSearch() {
             currentPapers = result.papers;
             displayPapers(result.papers);
             showStatus('search-status', `Found ${result.count} papers`, 'success');
+            
+            // Save to search history
+            addToSearchHistory(query, source, searchType);
             
             // Enable next steps
             updateWizardSteps();
@@ -459,6 +487,9 @@ async function handleExport(format) {
         if (result.success) {
             showStatus('export-status', `Successfully exported to: ${result.filepath}`, 'success');
             console.log('[Export] [OK] Exported to:', result.filepath);
+            
+            // Show confirmation dialog
+            showExportConfirmation(result.filepath);
         } else {
             showStatus('export-status', `Error: ${result.error}`, 'error');
             console.error('[Export] [ERROR] Error:', result.error);
@@ -602,8 +633,367 @@ document.addEventListener('keydown', (e) => {
         document.querySelectorAll('.modal.show').forEach(modal => {
             modal.classList.remove('show');
         });
+        
+        // Close search history dropdown
+        const historyDropdown = document.getElementById('search-history');
+        if (historyDropdown && historyDropdown.style.display !== 'none') {
+            historyDropdown.style.display = 'none';
+        }
     }
 });
+
+// Search History Functions
+function initSearchHistory() {
+    console.log('[SearchHistory] Initializing search history...');
+    
+    // Load search history from localStorage
+    loadSearchHistory();
+    
+    // Add event listeners
+    const searchInput = document.getElementById('search-query');
+    const historyDropdown = document.getElementById('search-history');
+    const clearAllBtn = document.getElementById('clear-all-history');
+    
+    if (searchInput) {
+        searchInput.addEventListener('focus', showSearchHistory);
+        searchInput.addEventListener('blur', (e) => {
+            // Delay hiding to allow clicking on history items
+            setTimeout(() => {
+                if (!historyDropdown.contains(document.activeElement)) {
+                    hideSearchHistory();
+                }
+            }, 200);
+        });
+        searchInput.addEventListener('input', filterSearchHistory);
+    }
+    
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', clearAllSearchHistory);
+    }
+    
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !historyDropdown.contains(e.target)) {
+            hideSearchHistory();
+        }
+    });
+}
+
+function loadSearchHistory() {
+    try {
+        const saved = localStorage.getItem('paperlens_search_history');
+        if (saved) {
+            searchHistory = JSON.parse(saved);
+            console.log(`[SearchHistory] Loaded ${searchHistory.length} history items`);
+        }
+    } catch (error) {
+        console.error('[SearchHistory] Error loading history:', error);
+        searchHistory = [];
+    }
+}
+
+function saveSearchHistory() {
+    try {
+        localStorage.setItem('paperlens_search_history', JSON.stringify(searchHistory));
+        console.log(`[SearchHistory] Saved ${searchHistory.length} history items`);
+    } catch (error) {
+        console.error('[SearchHistory] Error saving history:', error);
+    }
+}
+
+function addToSearchHistory(query, source, searchType) {
+    if (!query || query.trim().length === 0) return;
+    
+    const historyItem = {
+        id: Date.now(),
+        query: query.trim(),
+        source: source || 'all',
+        searchType: searchType || 'all',
+        timestamp: new Date().toISOString(),
+        displayTime: new Date().toLocaleString()
+    };
+    
+    // Remove existing item with same query
+    searchHistory = searchHistory.filter(item => item.query !== historyItem.query);
+    
+    // Add to beginning
+    searchHistory.unshift(historyItem);
+    
+    // Limit to 20 items
+    if (searchHistory.length > 20) {
+        searchHistory = searchHistory.slice(0, 20);
+    }
+    
+    saveSearchHistory();
+    console.log(`[SearchHistory] Added: ${query}`);
+}
+
+function showSearchHistory() {
+    const historyDropdown = document.getElementById('search-history');
+    if (historyDropdown && searchHistory.length > 0) {
+        renderSearchHistory();
+        historyDropdown.style.display = 'block';
+    }
+}
+
+function hideSearchHistory() {
+    const historyDropdown = document.getElementById('search-history');
+    if (historyDropdown) {
+        historyDropdown.style.display = 'none';
+    }
+}
+
+function filterSearchHistory() {
+    const searchInput = document.getElementById('search-query');
+    const query = searchInput.value.toLowerCase();
+    
+    if (query.length === 0) {
+        renderSearchHistory();
+        return;
+    }
+    
+    const filtered = searchHistory.filter(item => 
+        item.query.toLowerCase().includes(query)
+    );
+    
+    renderSearchHistory(filtered);
+}
+
+function renderSearchHistory(items = null) {
+    const historyList = document.getElementById('search-history-list');
+    const historyDropdown = document.getElementById('search-history');
+    
+    if (!historyList || !historyDropdown) return;
+    
+    const itemsToRender = items || searchHistory;
+    
+    if (itemsToRender.length === 0) {
+        historyList.innerHTML = '<div class="search-history-empty">No search history found</div>';
+        historyDropdown.style.display = 'none';
+        return;
+    }
+    
+    historyList.innerHTML = itemsToRender.map(item => `
+        <div class="search-history-item" data-query="${item.query}" data-source="${item.source}" data-type="${item.searchType}">
+            <div class="search-history-text">${item.query}</div>
+            <div class="search-history-meta">${item.displayTime}</div>
+            <button class="search-history-delete" onclick="deleteSearchHistoryItem(${item.id}, event)" title="Delete this search">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+    
+    // Add click handlers for history items
+    historyList.querySelectorAll('.search-history-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-history-delete')) {
+                const query = item.dataset.query;
+                const source = item.dataset.source;
+                const type = item.dataset.type;
+                
+                // Fill the search form
+                document.getElementById('search-query').value = query;
+                document.getElementById('source-select').value = source;
+                document.getElementById('search-type').value = type;
+                
+                hideSearchHistory();
+                
+                // Trigger search
+                handleSearch();
+            }
+        });
+    });
+}
+
+function deleteSearchHistoryItem(id, event) {
+    event.stopPropagation();
+    
+    searchHistory = searchHistory.filter(item => item.id !== id);
+    saveSearchHistory();
+    renderSearchHistory();
+    
+    console.log(`[SearchHistory] Deleted item with id: ${id}`);
+}
+
+function clearAllSearchHistory() {
+    if (confirm('Are you sure you want to clear all search history?')) {
+        searchHistory = [];
+        saveSearchHistory();
+        hideSearchHistory();
+        console.log('[SearchHistory] Cleared all history');
+    }
+}
+
+// Statistics Functions
+async function updateStatistics() {
+    if (!currentPapers || currentPapers.length === 0) {
+        console.log('[Statistics] No papers to analyze');
+        return;
+    }
+    
+    try {
+        console.log('[Statistics] Updating statistics for', currentPapers.length, 'papers');
+        
+        const result = await pywebview.api.get_paper_statistics(currentPapers);
+        
+        if (result.success) {
+            displayStatistics(result.statistics);
+            console.log('[Statistics] [OK] Statistics updated');
+        } else {
+            console.error('[Statistics] [ERROR] Error:', result.error);
+        }
+    } catch (error) {
+        console.error('[Statistics] [ERROR] Exception:', error);
+    }
+}
+
+function displayStatistics(stats) {
+    // Update basic statistics
+    document.getElementById('total-papers').textContent = stats.total_papers || 0;
+    document.getElementById('total-authors').textContent = stats.total_authors || 0;
+    document.getElementById('year-range').textContent = stats.year_range || '-';
+    document.getElementById('data-sources').textContent = stats.data_sources || 0;
+    
+    // Update top authors
+    const topAuthorsList = document.getElementById('top-authors-list');
+    if (stats.top_authors && stats.top_authors.length > 0) {
+        topAuthorsList.innerHTML = stats.top_authors.map((author, index) => {
+            const rankClass = index < 3 ? `rank-${index + 1}` : '';
+            return `
+                <div class="author-item ${rankClass}">
+                    <div class="author-info">
+                        <div class="author-name">${author.name}</div>
+                        <div class="author-affiliation">${author.affiliation || 'No affiliation'}</div>
+                    </div>
+                    <div class="author-stats">
+                        <div class="author-paper-count">${author.paper_count}</div>
+                        <div class="author-paper-label">paper${author.paper_count !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        topAuthorsList.innerHTML = '<div class="no-data">No author data available</div>';
+    }
+}
+
+// Export Confirmation Functions
+let currentExportedFile = null;
+
+function showExportConfirmation(filepath) {
+    currentExportedFile = filepath;
+    
+    // Extract filename from path for display
+    const filename = filepath.split('/').pop() || filepath.split('\\').pop() || filepath;
+    
+    // Update modal content
+    document.getElementById('exported-file-path').textContent = filename;
+    
+    // Show modal
+    const modal = document.getElementById('export-confirmation-modal');
+    modal.style.display = 'block';
+    
+    console.log('[Export] Showing confirmation dialog for:', filepath);
+}
+
+function closeExportConfirmation() {
+    const modal = document.getElementById('export-confirmation-modal');
+    modal.style.display = 'none';
+    currentExportedFile = null;
+    console.log('[Export] Confirmation dialog closed');
+}
+
+async function openExportedFile() {
+    if (!currentExportedFile) {
+        console.error('[Export] No file to open');
+        return;
+    }
+    
+    try {
+        console.log('[Export] Opening file:', currentExportedFile);
+        const result = await pywebview.api.open_file(currentExportedFile);
+        
+        if (result.success) {
+            console.log('[Export] File opened successfully');
+            showStatus('export-status', 'File opened successfully', 'success');
+        } else {
+            console.log('[Export] Failed to open file:', result.error);
+            showStatus('export-status', `Failed to open file: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('[Export] Error opening file:', error);
+        showStatus('export-status', `Error opening file: ${error.message}`, 'error');
+    }
+    
+    closeExportConfirmation();
+}
+
+async function openFileManager() {
+    if (!currentExportedFile) {
+        console.error('[Export] No file to show in file manager');
+        return;
+    }
+    
+    try {
+        console.log('[Export] Opening file manager for:', currentExportedFile);
+        const result = await pywebview.api.open_file_manager(currentExportedFile);
+        
+        if (result.success) {
+            console.log('[Export] File manager opened successfully');
+            showStatus('export-status', 'File manager opened', 'success');
+        } else {
+            console.log('[Export] Failed to open file manager:', result.error);
+            showStatus('export-status', `Failed to open file manager: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('[Export] Error opening file manager:', error);
+        showStatus('export-status', `Error opening file manager: ${error.message}`, 'error');
+    }
+    
+    closeExportConfirmation();
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('export-confirmation-modal');
+    if (event.target === modal) {
+        closeExportConfirmation();
+    }
+}
+
+// App Info Functions
+async function loadAppInfo() {
+    try {
+        console.log('[AppInfo] Loading application information...');
+        const result = await pywebview.api.get_app_info();
+        
+        if (result.success) {
+            const appInfo = result.app_info;
+            console.log('[AppInfo] Loaded app info:', appInfo);
+            
+            // Update version in sidebar
+            const sidebarVersion = document.getElementById('sidebar-version');
+            if (sidebarVersion) {
+                sidebarVersion.textContent = appInfo.version;
+            }
+            
+            // Update version in about modal
+            const aboutVersion = document.getElementById('app-version');
+            if (aboutVersion) {
+                aboutVersion.textContent = appInfo.version;
+            }
+            
+            // Update page title
+            document.title = `${appInfo.name} v${appInfo.version}`;
+            
+            console.log('[AppInfo] Version information updated successfully');
+        } else {
+            console.error('[AppInfo] Failed to load app info:', result.error);
+        }
+    } catch (error) {
+        console.error('[AppInfo] Error loading app info:', error);
+    }
+}
 
 // Initialize
 console.log('[App] PaperLens Mini loaded');

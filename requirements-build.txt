@@ -1,0 +1,32 @@
+# PaperLens Mini Build Requirements
+# Install these packages before building with PyInstaller
+
+# All runtime requirements
+-r requirements.txt
+
+# Build tools
+pyinstaller>=6.0.0
+
+# Additional dependencies that PyInstaller might need
+altgraph>=0.17
+pefile>=2023.2.7; sys_platform == 'win32'
+pyinstaller-hooks-contrib>=2024.0
+macholib>=1.16; sys_platform == 'darwin'
+
+# Ensure all visualization libraries are present
+matplotlib>=3.8.0
+wordcloud>=1.9.0
+networkx>=3.0
+
+# Ensure scholarly is present
+scholarly>=1.7.0
+
+# Fake user agent (needed by scholarly)
+fake-useragent>=1.4.0
+
+# XML processing (needed by scholarly and beautifulsoup4)
+lxml>=4.9.0
+
+# Image processing (needed by wordcloud)
+Pillow>=10.0.0
+

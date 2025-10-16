@@ -22,6 +22,17 @@ datas = [
     (str(Path(SPECPATH) / 'favicon.png'), 'ui/images'),          # Updated favicon
 ]
 
+# Add fake_useragent data files (needed by scholarly)
+try:
+    import fake_useragent
+    import os
+    fake_ua_path = os.path.dirname(fake_useragent.__file__)
+    fake_ua_data = os.path.join(fake_ua_path, 'data')
+    if os.path.exists(fake_ua_data):
+        datas.append((fake_ua_data, 'fake_useragent/data'))
+except ImportError:
+    pass
+
 # Hidden imports - modules that PyInstaller might miss during analysis
 hiddenimports = [
     # PyWebView - macOS specific
@@ -36,20 +47,47 @@ hiddenimports = [
     'numpy',
     'requests',
     'beautifulsoup4',
+    'lxml',
+    'lxml.etree',
+    'lxml._elementpath',
     
     # Visualization
     'plotly',
     'plotly.graph_objects',
     'plotly.express',
+    'plotly.io',
+    'plotly.io._html',
+    'plotly.io._json',
     'networkx',
+    'networkx.algorithms',
+    'networkx.algorithms.centrality',
+    'networkx.algorithms.community',
+    'wordcloud',
+    'PIL',
+    'PIL.Image',
     
     # Export
     'openpyxl',
+    'openpyxl.workbook',
+    'openpyxl.styles',
+    'fpdf',
     'fpdf2',
     
     # Google Scholar
     'scholarly',
     'scholarly._navigator',
+    'scholarly.scholarly',
+    'scholarly.publication_parser',
+    'scholarly.author_parser',
+    'scholarly._proxy_generator',
+    'fake_useragent',
+    'fake_useragent.fake',
+    'fake_useragent.utils',
+    'fake_useragent.errors',
+    'bs4',
+    'bs4.element',
+    'bs4.builder',
+    'bs4.builder._lxml',
     
     # Standard library modules that might be missed
     'json',
@@ -62,6 +100,7 @@ hiddenimports = [
     'queue',
     'urllib.parse',
     'urllib.request',
+    'urllib3',
     'xml.etree.ElementTree',
     'html.parser',
     're',
@@ -71,6 +110,11 @@ hiddenimports = [
     'itertools',
     'functools',
     'operator',
+    'subprocess',
+    'platform',
+    'tempfile',
+    'shutil',
+    'logging',
 ]
 
 # Excluded modules to reduce size
@@ -83,7 +127,6 @@ excludes = [
     'jupyter',        # Notebooks
     'pytest',         # Testing
     'sphinx',         # Documentation
-    'matplotlib',     # Not used in Mini version
     'scipy',          # Not used in Mini version
     'sklearn',        # Not used in Mini version
     'tensorflow',     # Not used in Mini version
@@ -91,8 +134,8 @@ excludes = [
     'transformers',   # Not used in Mini version
     'spacy',          # Not used in Mini version
     'nltk',           # Not used in Mini version
-    'wordcloud',      # Not used in Mini version
     'seaborn',        # Not used in Mini version
+    # Note: matplotlib and wordcloud ARE used, do not exclude
     # Note: pandas.plotting is needed internally by pandas, do not exclude
 ]
 

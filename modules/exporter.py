@@ -9,6 +9,9 @@ from datetime import datetime
 from typing import List, Dict
 from fpdf import FPDF
 import json
+import os
+import platform
+import subprocess
 
 
 class Exporter:
@@ -288,23 +291,23 @@ class Exporter:
         pdf.add_page()
         
         # Title Page
-        pdf.set_font('Arial', 'B', 24)
-        pdf.cell(0, 20, 'PaperLens Mini', 0, 1, 'C')
-        pdf.set_font('Arial', 'B', 18)
-        pdf.cell(0, 10, 'Research Paper Analysis Report', 0, 1, 'C')
+        pdf.safe_set_font('Arial', 'B', 24)
+        pdf.safe_cell(0, 20, 'PaperLens Mini', 0, 1, 'C')
+        pdf.safe_set_font('Arial', 'B', 18)
+        pdf.safe_cell(0, 10, 'Research Paper Analysis Report', 0, 1, 'C')
         pdf.ln(10)
         
         # Date and metadata
-        pdf.set_font('Arial', '', 12)
-        pdf.cell(0, 8, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', 0, 1, 'C')
-        pdf.cell(0, 8, f'Total Papers Analyzed: {len(papers)}', 0, 1, 'C')
+        pdf.safe_set_font('Arial', '', 12)
+        pdf.safe_cell(0, 8, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', 0, 1, 'C')
+        pdf.safe_cell(0, 8, f'Total Papers Analyzed: {len(papers)}', 0, 1, 'C')
         pdf.ln(15)
         
         # Executive Summary Box
         pdf.set_fill_color(240, 248, 255)
-        pdf.set_font('Arial', 'B', 14)
-        pdf.cell(0, 10, 'Executive Summary', 0, 1, 'L', True)
-        pdf.set_font('Arial', '', 11)
+        pdf.safe_set_font('Arial', 'B', 14)
+        pdf.safe_cell(0, 10, 'Executive Summary', 0, 1, 'L', True)
+        pdf.safe_set_font('Arial', '', 11)
         
         total_papers = len(papers)
         total_citations = sum(p.get('citations', 0) for p in papers)
@@ -322,93 +325,93 @@ class Exporter:
         # Top cited papers
         top_papers = sorted(papers, key=lambda x: x.get('citations', 0), reverse=True)[:5]
         
-        pdf.cell(0, 7, f'Total Papers: {total_papers}', 0, 1)
-        pdf.cell(0, 7, f'Total Citations: {total_citations:,}', 0, 1)
-        pdf.cell(0, 7, f'Average Citations per Paper: {avg_citations:.2f}', 0, 1)
-        pdf.cell(0, 7, f'Year Range: {year_range}', 0, 1)
+        pdf.safe_cell(0, 7, f'Total Papers: {total_papers}', 0, 1)
+        pdf.safe_cell(0, 7, f'Total Citations: {total_citations:,}', 0, 1)
+        pdf.safe_cell(0, 7, f'Average Citations per Paper: {avg_citations:.2f}', 0, 1)
+        pdf.safe_cell(0, 7, f'Year Range: {year_range}', 0, 1)
         pdf.ln(5)
         
         # Source breakdown
-        pdf.set_font('Arial', 'B', 12)
-        pdf.cell(0, 7, 'Papers by Source:', 0, 1)
-        pdf.set_font('Arial', '', 11)
+        pdf.safe_set_font('Arial', 'B', 12)
+        pdf.safe_cell(0, 7, 'Papers by Source:', 0, 1)
+        pdf.safe_set_font('Arial', '', 11)
         for source, count in sources.items():
             percentage = (count / total_papers) * 100
-            pdf.cell(0, 6, f'  - {source}: {count} papers ({percentage:.1f}%)', 0, 1)
+            pdf.safe_cell(0, 6, f'  - {source}: {count} papers ({percentage:.1f}%)', 0, 1)
         pdf.ln(10)
         
         # Top 10 Most Cited Papers
         pdf.add_page()
-        pdf.set_font('Arial', 'B', 16)
-        pdf.cell(0, 10, '1. Top 10 Most Cited Papers', 0, 1)
+        pdf.safe_set_font('Arial', 'B', 16)
+        pdf.safe_cell(0, 10, '1. Top 10 Most Cited Papers', 0, 1)
         pdf.ln(3)
         
         for i, paper in enumerate(top_papers[:10], 1):
-            pdf.set_font('Arial', 'B', 11)
+            pdf.safe_set_font('Arial', 'B', 11)
             title = paper.get('title', 'N/A')[:100]
-            pdf.multi_cell(0, 6, f'{i}. {title}')
+            pdf.safe_multi_cell(0, 6, f'{i}. {title}')
             
-            pdf.set_font('Arial', '', 10)
+            pdf.safe_set_font('Arial', '', 10)
             authors = ', '.join(paper.get('authors', [])[:3])
             if len(paper.get('authors', [])) > 3:
                 authors += ' et al.'
-            pdf.cell(0, 5, f'   Authors: {authors}', 0, 1)
+            pdf.safe_cell(0, 5, f'   Authors: {authors}', 0, 1)
             
             year = paper.get('publication_date', 'N/A')
             citations = paper.get('citations', 0)
             source = paper.get('source', 'N/A')
             journal = paper.get('journal', 'N/A')
-            pdf.cell(0, 5, f'   Journal: {journal[:50]}', 0, 1)
-            pdf.cell(0, 5, f'   Year: {year}  |  Citations: {citations:,}  |  Source: {source}', 0, 1)
+            pdf.safe_cell(0, 5, f'   Journal: {journal[:50]}', 0, 1)
+            pdf.safe_cell(0, 5, f'   Year: {year}  |  Citations: {citations:,}  |  Source: {source}', 0, 1)
             
             if paper.get('doi'):
-                pdf.set_font('Arial', '', 9)
-                pdf.cell(0, 5, f'   DOI: {paper["doi"]}', 0, 1)
+                pdf.safe_set_font('Arial', '', 9)
+                pdf.safe_cell(0, 5, f'   DOI: {paper["doi"]}', 0, 1)
             
             pdf.ln(3)
         
         # Year Distribution Statistics
         pdf.add_page()
-        pdf.set_font('Arial', 'B', 16)
-        pdf.cell(0, 10, '2. Publications by Year', 0, 1)
+        pdf.safe_set_font('Arial', 'B', 16)
+        pdf.safe_cell(0, 10, '2. Publications by Year', 0, 1)
         pdf.ln(3)
         
         if years:
             from collections import Counter
             year_counts = Counter(years)
-            pdf.set_font('Arial', '', 11)
+            pdf.safe_set_font('Arial', '', 11)
             
             for year in sorted(year_counts.keys(), reverse=True):
                 count = year_counts[year]
                 percentage = (count / len(years)) * 100
-                pdf.cell(0, 6, f'{year}: {count} papers ({percentage:.1f}%)', 0, 1)
+                pdf.safe_cell(0, 6, f'{year}: {count} papers ({percentage:.1f}%)', 0, 1)
         else:
-            pdf.set_font('Arial', '', 11)
-            pdf.cell(0, 6, 'No year data available', 0, 1)
+            pdf.safe_set_font('Arial', '', 11)
+            pdf.safe_cell(0, 6, 'No year data available', 0, 1)
         
         pdf.ln(10)
         
         # Full Papers List
         pdf.add_page()
-        pdf.set_font('Arial', 'B', 16)
-        pdf.cell(0, 10, '3. Complete Papers List', 0, 1)
+        pdf.safe_set_font('Arial', 'B', 16)
+        pdf.safe_cell(0, 10, '3. Complete Papers List', 0, 1)
         pdf.ln(5)
         
         for i, paper in enumerate(papers[:100], 1):  # Limit to 100 papers
-            pdf.set_font('Arial', 'B', 10)
+            pdf.safe_set_font('Arial', 'B', 10)
             title = paper.get('title', 'N/A')[:120]
-            pdf.multi_cell(0, 5, f'{i}. {title}')
+            pdf.safe_multi_cell(0, 5, f'{i}. {title}')
             
-            pdf.set_font('Arial', '', 9)
+            pdf.safe_set_font('Arial', '', 9)
             authors = ', '.join(paper.get('authors', [])[:4])
             if len(paper.get('authors', [])) > 4:
                 authors += ' et al.'
-            pdf.cell(0, 4, f'   Authors: {authors[:100]}', 0, 1)
+            pdf.safe_cell(0, 4, f'   Authors: {authors[:100]}', 0, 1)
             
             year = paper.get('publication_date', 'N/A')
             citations = paper.get('citations', 0)
             source = paper.get('source', 'N/A')
-            pdf.cell(0, 4, f'   Year: {year}  |  Citations: {citations}  |  Source: {source}', 0, 1)
+            pdf.safe_cell(0, 4, f'   Year: {year}  |  Citations: {citations}  |  Source: {source}', 0, 1)
             pdf.ln(2)
             
             # Add new page every 12 papers
@@ -417,24 +420,80 @@ class Exporter:
         
         # Footer page
         pdf.add_page()
-        pdf.set_font('Arial', 'B', 14)
-        pdf.cell(0, 10, 'About This Report', 0, 1)
-        pdf.set_font('Arial', '', 10)
+        pdf.safe_set_font('Arial', 'B', 14)
+        pdf.safe_cell(0, 10, 'About This Report', 0, 1)
+        pdf.safe_set_font('Arial', '', 10)
         pdf.ln(3)
         
-        pdf.multi_cell(0, 5, 'This report was generated by PaperLens Mini, a lightweight research paper analysis tool.')
+        pdf.safe_multi_cell(0, 5, 'This report was generated by PaperLens Mini v1.0.0, a lightweight research paper analysis tool.')
         pdf.ln(3)
-        pdf.multi_cell(0, 5, 'Data Sources: CrossRef API, arXiv API')
+        pdf.safe_multi_cell(0, 5, 'Data Sources: CrossRef API, arXiv API')
         pdf.ln(3)
-        pdf.multi_cell(0, 5, 'Note: Citation counts may vary depending on the source database and update frequency.')
+        pdf.safe_multi_cell(0, 5, 'Note: Citation counts may vary depending on the source database and update frequency.')
         pdf.ln(5)
-        pdf.set_font('Arial', 'I', 9)
-        pdf.multi_cell(0, 5, 'Disclaimer: This software is provided "as is" without warranty of any kind. The data accuracy depends on external sources.')
+        pdf.safe_set_font('Arial', 'I', 9)
+        pdf.safe_multi_cell(0, 5, 'Disclaimer: This software is provided "as is" without warranty of any kind. The data accuracy depends on external sources.')
         
         pdf.output(str(filepath))
         
         print(f"[OK] Exported to PDF: {filepath}")
         return str(filepath)
+    
+    def open_file_manager(self, filepath: str) -> bool:
+        """Open file manager to the exported file location"""
+        try:
+            filepath = Path(filepath)
+            system = platform.system().lower()
+            
+            if system == 'darwin':  # macOS
+                subprocess.run(['open', '-R', str(filepath)], check=True)
+            elif system == 'windows':
+                subprocess.run(['explorer', '/select,', str(filepath)], check=True)
+            elif system == 'linux':
+                # Try different file managers
+                file_managers = ['nautilus', 'dolphin', 'thunar', 'pcmanfm', 'nemo']
+                for manager in file_managers:
+                    try:
+                        subprocess.run([manager, '--select', str(filepath)], check=True)
+                        break
+                    except (subprocess.CalledProcessError, FileNotFoundError):
+                        continue
+                else:
+                    # Fallback: open parent directory
+                    subprocess.run(['xdg-open', str(filepath.parent)], check=True)
+            else:
+                print(f"[FileManager] Unsupported OS: {system}")
+                return False
+            
+            print(f"[FileManager] Opened file manager for: {filepath}")
+            return True
+            
+        except Exception as e:
+            print(f"[FileManager] Error opening file manager: {e}")
+            return False
+    
+    def open_file(self, filepath: str) -> bool:
+        """Open the exported file directly with default application"""
+        try:
+            filepath = Path(filepath)
+            system = platform.system().lower()
+            
+            if system == 'darwin':  # macOS
+                subprocess.run(['open', str(filepath)], check=True)
+            elif system == 'windows':
+                os.startfile(str(filepath))
+            elif system == 'linux':
+                subprocess.run(['xdg-open', str(filepath)], check=True)
+            else:
+                print(f"[FileOpen] Unsupported OS: {system}")
+                return False
+            
+            print(f"[FileOpen] Opened file: {filepath}")
+            return True
+            
+        except Exception as e:
+            print(f"[FileOpen] Error opening file: {e}")
+            return False
     
     def _extract_year(self, date_str) -> int:
         """Extract year from date string"""
@@ -465,19 +524,143 @@ class Exporter:
 
 
 class PDF(FPDF):
-    """Custom PDF class with header and footer"""
+    """Custom PDF class with header and footer and Unicode support"""
+    
+    def __init__(self):
+        super().__init__()
+        self.unicode_font = 'Arial'  # Use Arial as default since it's built-in
+        self.fallback_font = 'Arial'
+        
+        # Try to add DejaVu font for Unicode support
+        try:
+            # Check if DejaVu fonts are available in common locations
+            import os
+            font_paths = [
+                '/System/Library/Fonts/DejaVuSans.ttf',  # macOS
+                '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',  # Linux
+                'C:\\Windows\\Fonts\\DejaVuSans.ttf',  # Windows
+                './fonts/DejaVuSans.ttf',  # Local fonts directory
+            ]
+            
+            dejavu_found = False
+            for font_path in font_paths:
+                if os.path.exists(font_path):
+                    font_dir = os.path.dirname(font_path)
+                    self.add_font('DejaVu', '', os.path.join(font_dir, 'DejaVuSans.ttf'), uni=True)
+                    self.add_font('DejaVu', 'B', os.path.join(font_dir, 'DejaVuSans-Bold.ttf'), uni=True)
+                    self.add_font('DejaVu', 'I', os.path.join(font_dir, 'DejaVuSans-Oblique.ttf'), uni=True)
+                    self.add_font('DejaVu', 'BI', os.path.join(font_dir, 'DejaVuSans-BoldOblique.ttf'), uni=True)
+                    self.unicode_font = 'DejaVu'
+                    dejavu_found = True
+                    print("[PDF] DejaVu fonts loaded successfully")
+                    break
+            
+            if not dejavu_found:
+                print("[PDF] DejaVu fonts not found, using Arial with character replacement")
+                
+        except Exception as e:
+            print(f"[PDF] DejaVu fonts not available, using Arial with character replacement: {e}")
+            self.unicode_font = 'Arial'
+    
+    def safe_set_font(self, family, style='', size=12):
+        """Set font with fallback for Unicode characters"""
+        try:
+            # Always use Arial since it's built-in and reliable
+            self.set_font('Arial', style, size)
+        except Exception as e:
+            print(f"[PDF] Font error, using fallback: {e}")
+            # Last resort: use default font
+            self.set_font('', style, size)
+    
+    def safe_multi_cell(self, w, h, txt, border=0, align='J', fill=False):
+        """Multi-cell with Unicode character handling"""
+        try:
+            # Clean text to remove problematic characters
+            clean_txt = self._clean_text(txt)
+            self.multi_cell(w, h, clean_txt, border, align, fill)
+        except Exception as e:
+            print(f"[PDF] Text rendering error: {e}")
+            # Fallback: replace problematic characters
+            fallback_txt = self._replace_problematic_chars(txt)
+            self.multi_cell(w, h, fallback_txt, border, align, fill)
+    
+    def safe_cell(self, w, h, txt, border=0, ln=0, align='', fill=False):
+        """Cell with Unicode character handling"""
+        try:
+            clean_txt = self._clean_text(txt)
+            self.cell(w, h, clean_txt, border, ln, align, fill)
+        except Exception as e:
+            print(f"[PDF] Text rendering error: {e}")
+            fallback_txt = self._replace_problematic_chars(txt)
+            self.cell(w, h, fallback_txt, border, ln, align, fill)
+    
+    def _clean_text(self, text):
+        """Clean text for PDF rendering"""
+        if not text:
+            return text
+        
+        # Replace common problematic characters
+        replacements = {
+            ''': "'",
+            ''': "'",
+            '"': '"',
+            '"': '"',
+            '–': '-',
+            '—': '-',
+            '…': '...',
+            '°': ' degrees',
+            '±': '+/-',
+            '×': 'x',
+            '÷': '/',
+            '≤': '<=',
+            '≥': '>=',
+            '≠': '!=',
+            '≈': '~',
+            '∞': 'infinity',
+            'α': 'alpha',
+            'β': 'beta',
+            'γ': 'gamma',
+            'δ': 'delta',
+            'ε': 'epsilon',
+            'θ': 'theta',
+            'λ': 'lambda',
+            'μ': 'mu',
+            'π': 'pi',
+            'σ': 'sigma',
+            'τ': 'tau',
+            'φ': 'phi',
+            'χ': 'chi',
+            'ψ': 'psi',
+            'ω': 'omega'
+        }
+        
+        result = str(text)
+        for unicode_char, replacement in replacements.items():
+            result = result.replace(unicode_char, replacement)
+        
+        return result
+    
+    def _replace_problematic_chars(self, text):
+        """Replace all non-ASCII characters with safe alternatives"""
+        if not text:
+            return text
+        
+        result = str(text)
+        # Replace any remaining non-ASCII characters with '?'
+        result = ''.join(char if ord(char) < 128 else '?' for char in result)
+        return result
     
     def header(self):
         """Add header to each page"""
         if self.page_no() > 1:
-            self.set_font('Arial', 'I', 10)
-            self.cell(0, 10, 'PaperLens Mini Report', 0, 0, 'L')
-            self.cell(0, 10, f'Page {self.page_no()}', 0, 1, 'R')
+            self.safe_set_font('Arial', 'I', 10)
+            self.safe_cell(0, 10, 'PaperLens Mini Report', 0, 0, 'L')
+            self.safe_cell(0, 10, f'Page {self.page_no()}', 0, 1, 'R')
             self.ln(5)
     
     def footer(self):
         """Add footer to each page"""
         self.set_y(-15)
-        self.set_font('Arial', 'I', 8)
-        self.cell(0, 10, 'Generated by PaperLens Mini', 0, 0, 'C')
+        self.safe_set_font('Arial', 'I', 8)
+        self.safe_cell(0, 10, 'Generated by PaperLens Mini', 0, 0, 'C')
 

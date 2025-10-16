@@ -27,26 +27,65 @@ This guide will help you build a standalone macOS application for PaperLens Mini
 
 ## 🚀 Quick Build
 
-1. **Open Terminal**
-2. **Navigate to project directory**
-   ```bash
-   cd path/to/paperlens-mini
-   ```
-3. **Activate virtual environment** (if using one)
-   ```bash
-   source venv/bin/activate
-   ```
-4. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   pip install pyinstaller
-   ```
-5. **Run build script**
-   ```bash
-   cd build_scripts/macos
-   chmod +x build.sh
-   ./build.sh
-   ```
+### Option 1: Master Script (Recommended)
+```bash
+# 1. Navigate to project directory
+cd path/to/paperlens-mini
+
+# 2. Activate virtual environment
+source venv/bin/activate
+
+# 3. Run master build script
+cd build_scripts/macos
+./master_build.sh
+```
+
+### Option 2: Automated Build
+```bash
+# 1. Navigate to project directory
+cd path/to/paperlens-mini
+
+# 2. Activate virtual environment
+source venv/bin/activate
+
+# 3. Run verification and build script
+cd build_scripts/macos
+./verify_and_build.sh
+```
+
+### Option 3: Manual Build
+```bash
+# 1. Navigate to project directory
+cd path/to/paperlens-mini
+
+# 2. Activate virtual environment
+source venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements-build.txt
+
+# 4. Run build script
+cd build_scripts/macos
+./build.sh
+```
+
+## 🛠️ Available Scripts
+
+### Master Scripts
+- **`master_build.sh`** - Main orchestration script with menu options
+- **`verify_and_build.sh`** - Automated dependency verification and build
+
+### Individual Scripts
+- **`build.sh`** - Basic app build (requires dependencies pre-installed)
+- **`create_dmg.sh`** - Create DMG installer from existing app
+
+### Script Features
+- ✅ **Error handling** - Comprehensive error checking and reporting
+- ✅ **Dependency verification** - Automatic package checking and installation
+- ✅ **Progress feedback** - Clear status updates and emoji indicators
+- ✅ **Interactive prompts** - User-friendly confirmation dialogs
+- ✅ **Post-build verification** - Automatic testing and validation
+- ✅ **Cleanup** - Automatic temporary file cleanup
 
 ## 📦 What You Get
 
@@ -105,8 +144,34 @@ chmod +x create_dmg.sh
 ```
 
 ### Build fails with "Module not found"
-- Add missing modules to `hiddenimports` in spec file
-- Rebuild: `pyinstaller paperlens_mini_macos.spec --clean`
+
+**Common missing modules:**
+- `ModuleNotFoundError: No module named 'fpdf'`
+  - Make sure `fpdf2` is installed: `pip install fpdf2`
+  - Already added to hiddenimports in spec file
+
+- `scholarly library not installed`
+  - Install: `pip install scholarly`
+  - Already added to hiddenimports in spec file
+
+- `NetworkX not available`
+  - Install: `pip install networkx`
+  - Already added to hiddenimports in spec file
+
+- `WordCloud not available`
+  - Install: `pip install wordcloud`
+  - Already added to hiddenimports in spec file
+
+**Solution:**
+1. Install all build dependencies:
+   ```bash
+   pip install -r requirements-build.txt
+   ```
+2. Clean rebuild:
+   ```bash
+   pyinstaller paperlens_mini_macos.spec --clean --noconfirm
+   ```
+3. If still failing, add missing modules to `hiddenimports` in spec file
 
 ### Large file size
 - Normal for PyInstaller builds (~500 MB)
