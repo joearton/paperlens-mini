@@ -1,6 +1,6 @@
-# 🪟 Windows Build Guide - PaperLens Mini
+# 🪟 Windows Build Guide - Sintesa
 
-This guide will help you build a standalone Windows executable for PaperLens Mini.
+This guide will help you build a standalone Windows executable for Sintesa.
 
 ## 📋 Prerequisites
 
@@ -24,7 +24,7 @@ This guide will help you build a standalone Windows executable for PaperLens Min
 1. **Open Command Prompt** as Administrator
 2. **Navigate to project directory**
    ```cmd
-   cd path\to\paperlens-mini
+   cd path\to\sintesa
    ```
 3. **Activate virtual environment** (if using one)
    ```cmd
@@ -43,7 +43,7 @@ This guide will help you build a standalone Windows executable for PaperLens Min
 
 ## 📦 What You Get
 
-- **Executable**: `dist\PaperLensMini.exe`
+- **Executable**: `dist\Sintesa.exe`
 - **Size**: ~500 MB (includes Python runtime and all dependencies)
 - **Standalone**: No Python installation required on target machines
 
@@ -51,7 +51,7 @@ This guide will help you build a standalone Windows executable for PaperLens Min
 
 1. **Run the executable**
    ```cmd
-   dist\PaperLensMini.exe
+   dist\Sintesa.exe
    ```
 
 2. **Test core features**
@@ -68,7 +68,7 @@ This guide will help you build a standalone Windows executable for PaperLens Min
 
 ### Option 2: ZIP Package
 ```cmd
-Compress-Archive -Path dist\PaperLensMini.exe -DestinationPath PaperLensMini-Windows.zip
+Compress-Archive -Path dist\Sintesa.exe -DestinationPath Sintesa-Windows.zip
 ```
 
 ### Option 3: Installer (Advanced)
@@ -95,7 +95,7 @@ pip install pyinstaller
 
 ### Build fails with "Module not found"
 - Add missing modules to `hiddenimports` in spec file
-- Rebuild: `pyinstaller paperlens_mini_windows.spec --clean`
+- Rebuild: `pyinstaller sintesa_windows.spec --clean`
 
 ### Large file size
 - Normal for PyInstaller builds (~500 MB)
@@ -112,7 +112,7 @@ pip install pyinstaller
    ```
 
 ### Reducing Size
-Edit `paperlens_mini_windows.spec`:
+Edit `sintesa_windows.spec`:
 ```python
 excludes = [
     'matplotlib',    # Remove if not needed

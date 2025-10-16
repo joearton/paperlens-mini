@@ -1,5 +1,5 @@
 """
-Data Fetcher Module for PaperLens Mini
+Data Fetcher Module for Sintesa
 Handles fetching papers from various academic sources
 """
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "===================================="
-echo "PaperLens Mini Launcher"
+echo "Sintesa Launcher"
 echo "===================================="
 echo
 
@@ -23,7 +23,7 @@ pip install -r requirements.txt
 echo
 
 # Run application
-echo "Starting PaperLens Mini..."
+echo "Starting Sintesa..."
 echo
 python app.py
 

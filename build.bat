@@ -1,5 +1,5 @@
 @echo off
-REM Quick build script for PaperLens Mini Windows
-echo Building PaperLens Mini for Windows...
+REM Quick build script for Sintesa Windows
+echo Building Sintesa for Windows...
 cd build_scripts\windows
 build.bat

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Quick build script for PaperLens Mini (macOS/Linux)
-echo "Building PaperLens Mini..."
+# Quick build script for Sintesa (macOS/Linux)
+echo "Building Sintesa..."
 
 # Detect platform
 if [[ "$OSTYPE" == "darwin"* ]]; then

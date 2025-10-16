@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec file for PaperLens Mini - Linux Build
+PyInstaller spec file for Sintesa - Linux Build
 Build a standalone Linux executable
 """
 
@@ -131,7 +131,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='PaperLensMini',
+    name='Sintesa',
     debug=False,
     bootloader_ignore_signals=False,
     strip=True,  # Strip debug symbols on Linux

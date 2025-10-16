@@ -1,6 +1,6 @@
-# 🐧 Linux Build Guide - PaperLens Mini
+# 🐧 Linux Build Guide - Sintesa
 
-This guide will help you build a standalone Linux executable for PaperLens Mini.
+This guide will help you build a standalone Linux executable for Sintesa.
 
 ## 📋 Prerequisites
 
@@ -47,7 +47,7 @@ This guide will help you build a standalone Linux executable for PaperLens Mini.
 1. **Open Terminal**
 2. **Navigate to project directory**
    ```bash
-   cd path/to/paperlens-mini
+   cd path/to/sintesa
    ```
 3. **Activate virtual environment** (if using one)
    ```bash
@@ -67,8 +67,8 @@ This guide will help you build a standalone Linux executable for PaperLens Mini.
 
 ## 📦 What You Get
 
-- **Executable Directory**: `dist/PaperLensMini/`
-- **Main Executable**: `dist/PaperLensMini/PaperLensMini`
+- **Executable Directory**: `dist/Sintesa/`
+- **Main Executable**: `dist/Sintesa/Sintesa`
 - **Size**: ~500 MB (includes Python runtime and all dependencies)
 - **Standalone**: No Python installation required on target machines
 
@@ -76,8 +76,8 @@ This guide will help you build a standalone Linux executable for PaperLens Mini.
 
 1. **Run the application**
    ```bash
-   cd dist/PaperLensMini
-   ./PaperLensMini
+   cd dist/Sintesa
+   ./Sintesa
    ```
 
 2. **Test core features**
@@ -89,12 +89,12 @@ This guide will help you build a standalone Linux executable for PaperLens Mini.
 ## 📤 Distribution Options
 
 ### Option 1: Directory Bundle
-- Share the entire `PaperLensMini/` directory
-- Users run `./PaperLensMini` from the directory
+- Share the entire `Sintesa/` directory
+- Users run `./Sintesa` from the directory
 
 ### Option 2: TAR.GZ Archive
 ```bash
-tar -czf PaperLensMini-Linux.tar.gz -C dist PaperLensMini
+tar -czf Sintesa-Linux.tar.gz -C dist Sintesa
 ```
 
 ### Option 3: AppImage (Universal)
@@ -103,35 +103,35 @@ tar -czf PaperLensMini-Linux.tar.gz -C dist PaperLensMini
 sudo apt install appimagetool  # Ubuntu/Debian
 
 # Create AppImage
-appimagetool dist/PaperLensMini PaperLensMini-1.0.0-x86_64.AppImage
+appimagetool dist/Sintesa Sintesa-1.0.0-x86_64.AppImage
 ```
 
 ### Option 4: DEB Package (Ubuntu/Debian)
 ```bash
 # Create package structure
-mkdir -p paperlensmini/usr/local/bin
-mkdir -p paperlensmini/usr/share/applications
-mkdir -p paperlensmini/usr/share/icons/hicolor/256x256/apps
+mkdir -p sintesa/usr/local/bin
+mkdir -p sintesa/usr/share/applications
+mkdir -p sintesa/usr/share/icons/hicolor/256x256/apps
 
 # Copy files
-cp -r dist/PaperLensMini/* paperlensmini/usr/local/bin/
-cp PaperLensMini.png paperlensmini/usr/share/icons/hicolor/256x256/apps/
+cp -r dist/Sintesa/* sintesa/usr/local/bin/
+cp Sintesa.png sintesa/usr/share/icons/hicolor/256x256/apps/
 
 # Create desktop entry
-cat > paperlensmini/usr/share/applications/paperlensmini.desktop << EOF
+cat > sintesa/usr/share/applications/sintesa.desktop << EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=PaperLens Mini
+Name=Sintesa
 Comment=Research Gap Analysis Tool
-Exec=/usr/local/bin/PaperLensMini
-Icon=paperlensmini
+Exec=/usr/local/bin/Sintesa
+Icon=sintesa
 Terminal=false
 Categories=Science;Research;
 EOF
 
 # Build DEB package
-dpkg-deb --build paperlensmini paperlensmini-1.0.0-amd64.deb
+dpkg-deb --build sintesa sintesa-1.0.0-amd64.deb
 ```
 
 ### Option 5: RPM Package (Fedora/RHEL)
@@ -144,7 +144,7 @@ dpkg-deb --build paperlensmini paperlensmini-1.0.0-amd64.deb
 
 ### "Permission denied"
 ```bash
-chmod +x dist/PaperLensMini/PaperLensMini
+chmod +x dist/Sintesa/Sintesa
 ```
 
 ### "PyInstaller not found"
@@ -178,7 +178,7 @@ sudo pacman -S webkit2gtk
 
 ### Build fails with "Module not found"
 - Add missing modules to `hiddenimports` in spec file
-- Rebuild: `pyinstaller paperlens_mini_linux.spec --clean`
+- Rebuild: `pyinstaller sintesa_linux.spec --clean`
 
 ### Large file size
 - Normal for PyInstaller builds (~500 MB)
@@ -188,11 +188,11 @@ sudo pacman -S webkit2gtk
 ### App won't start
 ```bash
 # Run from terminal to see error messages
-cd dist/PaperLensMini
-./PaperLensMini
+cd dist/Sintesa
+./Sintesa
 
 # Check dependencies
-ldd PaperLensMini
+ldd Sintesa
 ```
 
 ## 🎨 Customization
@@ -201,12 +201,12 @@ ldd PaperLensMini
 1. Create PNG files in multiple sizes
 2. Update desktop entry file:
    ```ini
-   Icon=paperlensmini
+   Icon=sintesa
    ```
 3. Place icons in appropriate directories
 
 ### Reducing Size
-Edit `paperlens_mini_linux.spec`:
+Edit `sintesa_linux.spec`:
 ```python
 excludes = [
     'matplotlib',    # Remove if not needed
@@ -222,10 +222,10 @@ Create desktop entry file:
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=PaperLens Mini
+Name=Sintesa
 Comment=Research Gap Analysis Tool
-Exec=/path/to/PaperLensMini
-Icon=paperlensmini
+Exec=/path/to/Sintesa
+Icon=sintesa
 Terminal=false
 Categories=Science;Research;
 ```

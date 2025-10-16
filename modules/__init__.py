@@ -1,4 +1,4 @@
 """
-PaperLens Mini Modules
+Sintesa Modules
 """
 

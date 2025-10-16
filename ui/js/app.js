@@ -1,5 +1,5 @@
 /**
- * PaperLens Mini - Frontend JavaScript
+ * Sintesa - Frontend JavaScript
  * Simplified version without AI/ML features
  */
 
@@ -10,7 +10,7 @@ let searchHistory = [];
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('[Init] PaperLens Mini loading...');
+    console.log('[Init] Sintesa loading...');
     
     // Show loading screen
     showLoadingScreen();
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hide loading screen after short delay
     setTimeout(() => {
         hideLoadingScreen();
-        console.log('[Init] [OK] PaperLens Mini ready');
+        console.log('[Init] [OK] Sintesa ready');
         console.log(`[Init] Max results: 300, From year: ${defaultFromYear}`);
     }, 500);
 });
@@ -224,6 +224,13 @@ async function handleSearch() {
         return;
     }
     
+    // Check if pywebview is available
+    if (typeof pywebview === 'undefined') {
+        showStatus('search-status', 'Error: Application must be run through PyWebview', 'error');
+        console.error('[Search] PyWebview not available - app must run in desktop mode');
+        return;
+    }
+    
     const searchBtn = document.getElementById('search-btn');
     searchBtn.disabled = true;
     searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
@@ -324,6 +331,13 @@ async function handleVisualization() {
     if (typeof Plotly === 'undefined') {
         showStatus('viz-status', 'Plotly.js not loaded. Please check your internet connection.', 'error');
         console.error('[Viz] Plotly.js is not loaded!');
+        return;
+    }
+    
+    // Check if pywebview is available
+    if (typeof pywebview === 'undefined') {
+        showStatus('viz-status', 'Error: Application must be run through PyWebview', 'error');
+        console.error('[Viz] PyWebview not available - app must run in desktop mode');
         return;
     }
     
@@ -476,6 +490,13 @@ function initExportHandlers() {
 async function handleExport(format) {
     if (currentPapers.length === 0) {
         showStatus('export-status', 'No papers to export', 'error');
+        return;
+    }
+    
+    // Check if pywebview is available
+    if (typeof pywebview === 'undefined') {
+        showStatus('export-status', 'Error: Application must be run through PyWebview', 'error');
+        console.error('[Export] PyWebview not available - app must run in desktop mode');
         return;
     }
     
@@ -831,6 +852,12 @@ async function updateStatistics() {
         return;
     }
     
+    // Check if pywebview is available
+    if (typeof pywebview === 'undefined') {
+        console.log('[Statistics] PyWebview not available - skipping statistics update');
+        return;
+    }
+    
     try {
         console.log('[Statistics] Updating statistics for', currentPapers.length, 'papers');
         
@@ -919,6 +946,14 @@ async function openExportedFile() {
         return;
     }
     
+    // Check if pywebview is available
+    if (typeof pywebview === 'undefined') {
+        showStatus('export-status', 'Error: Application must be run through PyWebview', 'error');
+        console.error('[Export] PyWebview not available - app must run in desktop mode');
+        closeExportConfirmation();
+        return;
+    }
+    
     try {
         console.log('[Export] Opening file:', currentExportedFile);
         const result = await pywebview.api.open_file(currentExportedFile);
@@ -941,6 +976,14 @@ async function openExportedFile() {
 async function openFileManager() {
     if (!currentExportedFile) {
         console.error('[Export] No file to show in file manager');
+        return;
+    }
+    
+    // Check if pywebview is available
+    if (typeof pywebview === 'undefined') {
+        showStatus('export-status', 'Error: Application must be run through PyWebview', 'error');
+        console.error('[Export] PyWebview not available - app must run in desktop mode');
+        closeExportConfirmation();
         return;
     }
     
@@ -973,6 +1016,18 @@ window.onclick = function(event) {
 
 // App Info Functions
 async function loadAppInfo() {
+    // Check if pywebview is available
+    if (typeof pywebview === 'undefined') {
+        console.log('[AppInfo] Running in browser mode (pywebview not available)');
+        // Set default values for browser mode
+        document.title = 'Sintesa';
+        const aboutVersion = document.getElementById('app-version');
+        if (aboutVersion) {
+            aboutVersion.textContent = '1.0.0';
+        }
+        return;
+    }
+    
     try {
         console.log('[AppInfo] Loading application information...');
         const result = await pywebview.api.get_app_info();
@@ -980,12 +1035,6 @@ async function loadAppInfo() {
         if (result.success) {
             const appInfo = result.app_info;
             console.log('[AppInfo] Loaded app info:', appInfo);
-            
-            // Update version in sidebar
-            const sidebarVersion = document.getElementById('sidebar-version');
-            if (sidebarVersion) {
-                sidebarVersion.textContent = appInfo.version;
-            }
             
             // Update version in about modal
             const aboutVersion = document.getElementById('app-version');
@@ -1006,4 +1055,4 @@ async function loadAppInfo() {
 }
 
 // Initialize
-console.log('[App] PaperLens Mini loaded');
+console.log('[App] Sintesa loaded');

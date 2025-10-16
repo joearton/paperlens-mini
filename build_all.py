@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Master build script for PaperLens Mini
+Master build script for Sintesa
 Builds for all platforms (Windows, macOS, Linux)
 """
 
@@ -78,7 +78,7 @@ def build_linux():
 
 def main():
     """Main build function"""
-    print("PaperLens Mini - Multi-Platform Build Script")
+    print("Sintesa - Multi-Platform Build Script")
     print("=" * 50)
     
     # Check if we're in the right directory
@@ -167,7 +167,7 @@ def main():
                 if item.is_file() and item.suffix in [".exe", ".dmg", ".AppImage"]:
                     size_mb = item.stat().st_size / (1024 * 1024)
                     print(f"   {item.name} ({size_mb:.1f} MB)")
-                elif item.is_dir() and item.name.startswith("PaperLensMini"):
+                elif item.is_dir() and item.name.startswith("Sintesa"):
                     print(f"   {item.name}/")
     else:
         print("[WARNING] Some builds failed. Check the error messages above.")

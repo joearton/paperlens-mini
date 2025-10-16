@@ -1,5 +1,5 @@
 """
-Base Source Class for PaperLens Mini Data Sources
+Base Source Class for Sintesa Data Sources
 """
 
 from abc import ABC, abstractmethod
@@ -35,7 +35,7 @@ class BaseSource(ABC):
         self.source_name = self.__class__.__name__.lower().replace('source', '')
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'PaperLens-Mini/1.0 (Academic Research Tool)'
+            'User-Agent': 'Sintesa/1.0 (Academic Research Tool)'
         })
     
     @property

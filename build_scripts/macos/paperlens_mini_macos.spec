@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec file for PaperLens Mini - macOS Build
+PyInstaller spec file for Sintesa - macOS Build
 Build a standalone macOS application bundle (.app)
 """
 
@@ -167,7 +167,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='PaperLensMini',
+    name='Sintesa',
     debug=False,
     bootloader_ignore_signals=False,
     strip=True,  # Strip debug symbols on macOS
@@ -187,7 +187,7 @@ exe = EXE(
 # Create macOS app bundle
 app = BUNDLE(
     exe,
-    name='PaperLensMini.app',
+    name='Sintesa.app',
     icon=str(Path(SPECPATH) / 'favicon.png'),  # Updated favicon as macOS bundle icon
     bundle_identifier='com.artonlabs.paperlensmini',
     info_plist={
@@ -196,9 +196,9 @@ app = BUNDLE(
         'LSMinimumSystemVersion': '10.14.0',
         'CFBundleShortVersionString': '1.0.0',
         'CFBundleVersion': '1.0.0',
-        'CFBundleName': 'PaperLens Mini',
-        'CFBundleDisplayName': 'PaperLens Mini',
-        'CFBundleExecutable': 'PaperLensMini',
+        'CFBundleName': 'Sintesa',
+        'CFBundleDisplayName': 'Sintesa',
+        'CFBundleExecutable': 'Sintesa',
         'CFBundleIdentifier': 'com.artonlabs.paperlensmini',
         'CFBundlePackageType': 'APPL',
         'CFBundleSignature': '????',

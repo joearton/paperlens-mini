@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec file for PaperLens Mini - Windows Build
+PyInstaller spec file for Sintesa - Windows Build
 Build a standalone Windows executable (.exe)
 """
 
@@ -127,7 +127,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='PaperLensMini',
+    name='Sintesa',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

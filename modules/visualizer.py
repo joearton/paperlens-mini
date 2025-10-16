@@ -1,5 +1,5 @@
 """
-Visualizer Module for PaperLens Mini
+Visualizer Module for Sintesa
 Creates simple visualizations without AI/ML
 """
 

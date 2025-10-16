@@ -1,12 +1,12 @@
-# PaperLens Mini
+# Sintesa
 
-**Simple Research Paper Analyzer - Without AI/ML**
+**Simple Research Paper Analyzer**
 
-PaperLens Mini adalah versi sederhana dari PaperLens yang fokus pada pencarian dan visualisasi paper akademik tanpa menggunakan model AI/ML dan fitur translation. Cocok untuk penggunaan yang lebih ringan dan cepat.
+Sintesa adalah aplikasi lightweight untuk pencarian dan visualisasi paper akademik tanpa menggunakan model AI/ML. Fokus pada fitur-fitur essential: search, visualize, dan export.
 
 ## 🌟 Fitur
 
-### ✅ Yang Ada di PaperLens Mini:
+### ✅ Fitur Utama Sintesa:
 
 - **🔍 Multi-Source Paper Search**
   - CrossRef API (140M+ papers)
@@ -34,13 +34,11 @@ PaperLens Mini adalah versi sederhana dari PaperLens yang fokus pada pencarian d
   - Keyboard shortcuts (F1, Ctrl+D, ESC)
   - Responsive design
 
-### ❌ Yang Tidak Ada (dibanding PaperLens Full):
-- ❌ AI/ML Models (Google Flan-T5, spaCy, Sentence Transformers)
-- ❌ NLP Analysis (topic modeling, keyword extraction)
-- ❌ RAG System (Q&A with AI)
-- ❌ Deep Translator (Indonesian translation)
-- ❌ Advanced research gap detection
-- ❌ 16+ data sources (hanya 2-3 sources)
+### ⚡ Keunggulan:
+- ⚡ Ringan: ~50MB tanpa AI/ML models
+- ⚡ Cepat: Startup ~2 detik
+- ⚡ Simple: Fokus pada fitur essential
+- ⚡ Reliable: Data langsung dari sumber akademik terpercaya
 
 ## 📋 Requirements
 
@@ -103,9 +101,9 @@ python build_all.py
 ```
 
 **Build Output:**
-- Windows: `dist/PaperLensMini.exe` (~500 MB)
-- macOS: `dist/PaperLensMini.app` (~500 MB)  
-- Linux: `dist/PaperLensMini/PaperLensMini` (~500 MB)
+- Windows: `dist/Sintesa.exe` (~500 MB)
+- macOS: `dist/Sintesa.app` (~500 MB)  
+- Linux: `dist/Sintesa/Sintesa` (~500 MB)
 
 See [`build_scripts/README.md`](build_scripts/README.md) for detailed build instructions.
 
@@ -153,7 +151,7 @@ See [`build_scripts/README.md`](build_scripts/README.md) for detailed build inst
 ## 🏗️ Project Structure
 
 ```
-paperlens-mini/
+sintesa/
 ├── app.py                      # Main application
 ├── config.py                   # Configuration
 ├── requirements.txt            # Dependencies
@@ -286,23 +284,55 @@ MAX_RESULTS_PER_SOURCE = 300
 - **Scroll to Top**: Button appears after scrolling
 - **Close Modals**: Click outside or press `ESC`
 
-## 🆚 PaperLens vs PaperLens Mini
+## 📊 Tech Stack
 
-| Feature | PaperLens | PaperLens Mini |
-|---------|-----------|----------------|
-| Paper Search | ✅ (16+ sources) | ✅ (2 sources) |
-| Visualizations | ✅ Advanced | ✅ Basic (4 charts) |
-| Export | ✅ | ✅ |
-| AI/ML Analysis | ✅ | ❌ |
-| Topic Modeling | ✅ | ❌ |
-| Gap Detection | ✅ | ❌ |
-| RAG Q&A | ✅ | ❌ |
-| Translation | ✅ | ❌ |
-| Disk Space | ~2GB | ~50MB |
-| Startup Time | ~10s | ~2s |
-| UI Features | Full | Simplified |
-| Dark Mode | ✅ | ✅ |
-| Help/About | ✅ | ✅ |
+| Component | Technology |
+|-----------|-----------|
+| Language | Python 3.8+ |
+| Desktop Framework | PyWebview |
+| Visualizations | Plotly |
+| Data Processing | Pandas |
+| Data Sources | CrossRef API, arXiv API |
+| Frontend | HTML5, CSS3, JavaScript |
+| Build | PyInstaller |
+
+## 🆚 Sintesa vs Publish or Perish
+
+### Perbandingan Fitur
+
+| Aspek | Sintesa | Publish or Perish |
+|-------|---------|-------------------|
+| **Platform** | Windows, macOS, Linux | Windows, macOS, Linux |
+| **Size** | ~500 MB (bundled) / ~50 MB (source) | ~20 MB |
+| **Data Source** | CrossRef (140M+), arXiv | Google Scholar primarily |
+| **Interface** | Modern Web-based, Dark Mode | Classic Desktop UI |
+| **Visualisasi** | 5+ Interactive Charts (Plotly) | Basic tables & static charts |
+| **Export Format** | PDF, Excel, CSV, JSON | CSV, Excel, BibTeX, RTF |
+| **Citation Metrics** | Basic (from sources) | Advanced (h-index, g-index, etc.) |
+| **Open Source** | ✅ Yes (MIT License) | ❌ Freeware (closed source) |
+| **Development** | Active (Python-based) | Stable (Delphi-based) |
+| **Customization** | Easy to modify | Limited |
+| **API Access** | Direct (CrossRef, arXiv) | Via Google Scholar |
+
+### Kapan Menggunakan Sintesa?
+
+✅ **Gunakan Sintesa jika:**
+- Membutuhkan visualisasi interaktif yang modern
+- Ingin data dari CrossRef atau arXiv langsung
+- Perlu export format yang beragam (JSON, PDF report)
+- Suka interface modern dengan dark mode
+- Ingin modifikasi atau extend functionality
+- Membutuhkan open-source solution
+
+### Kapan Menggunakan Publish or Perish?
+
+✅ **Gunakan Publish or Perish jika:**
+- Fokus pada citation metrics (h-index, g-index)
+- Primarily menggunakan Google Scholar
+- Membutuhkan aplikasi yang sangat ringan (~20MB)
+- Sudah terbiasa dengan workflow PoP
+- Perlu analisis author impact mendalam
+- Ingin BibTeX export langsung
 
 ## 📝 Development
 
@@ -353,8 +383,48 @@ MIT License - See LICENSE file for details
 
 ## 📞 Support
 
-- Email: support@artonlabs.com
-- Issues: Create issue on repository
+- **Website**: [artonlabs.com](https://artonlabs.com)
+- **Email**: support@artonlabs.com
+- **GitHub**: [github.com/artonlabs/sintesa](https://github.com/artonlabs/sintesa)
+- **Issues**: Create issue on GitHub repository
+
+## 🚀 Roadmap
+
+### Version 1.1.0 (Planned)
+- [ ] Google Scholar integration improvements
+- [ ] Additional export templates
+- [ ] Custom visualization themes
+- [ ] Search history export
+
+### Version 1.2.0 (Future)
+- [ ] Batch processing capabilities
+- [ ] Advanced filtering options
+- [ ] Citation network visualization
+- [ ] Plugin system for extensibility
+
+## 📈 Why Sintesa?
+
+### Problem Statement
+Peneliti seringkali membutuhkan tools untuk:
+- Mencari paper dari multiple sources
+- Visualisasi tren penelitian dengan cepat
+- Export data untuk analisis lebih lanjut
+- Interface modern yang mudah digunakan
+
+Existing tools seperti Publish or Perish sangat bagus untuk citation metrics, namun:
+- Terbatas pada Google Scholar
+- Visualisasi yang basic
+- Tidak open source (sulit dimodifikasi)
+- Interface yang dated
+
+### Our Solution
+Sintesa menawarkan:
+- ✅ **Multi-source**: CrossRef (140M papers) + arXiv
+- ✅ **Modern UI**: Web-based interface dengan dark mode
+- ✅ **Interactive**: Plotly charts yang fully interactive
+- ✅ **Flexible**: Export ke 4 format berbeda
+- ✅ **Open Source**: MIT license, easy to modify
+- ✅ **Lightweight**: Tanpa AI/ML overhead (~50MB source)
 
 ---
 
@@ -382,8 +452,6 @@ All files saved to: `exports/` folder
 
 ---
 
-**PaperLens Mini** - Simple, fast, and lightweight research paper analyzer!
-
-*For AI-powered features, use the full PaperLens version*
+**Sintesa** - Simple, fast, and lightweight research paper analyzer!
 
 *Made with ❤️ by [ArtonLabs](https://artonlabs.com)*

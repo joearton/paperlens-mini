@@ -1,6 +1,6 @@
 """
-Configuration file for PaperLens Mini
-Simple version without AI/ML models
+Configuration file for Sintesa
+Simple Research Paper Analyzer
 """
 
 import os

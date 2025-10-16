@@ -1,6 +1,6 @@
-# 🍎 macOS Build Guide - PaperLens Mini
+# 🍎 macOS Build Guide - Sintesa
 
-This guide will help you build a standalone macOS application for PaperLens Mini.
+This guide will help you build a standalone macOS application for Sintesa.
 
 ## 📋 Prerequisites
 
@@ -30,7 +30,7 @@ This guide will help you build a standalone macOS application for PaperLens Mini
 ### Option 1: Master Script (Recommended)
 ```bash
 # 1. Navigate to project directory
-cd path/to/paperlens-mini
+cd path/to/sintesa
 
 # 2. Activate virtual environment
 source venv/bin/activate
@@ -43,7 +43,7 @@ cd build_scripts/macos
 ### Option 2: Automated Build
 ```bash
 # 1. Navigate to project directory
-cd path/to/paperlens-mini
+cd path/to/sintesa
 
 # 2. Activate virtual environment
 source venv/bin/activate
@@ -56,7 +56,7 @@ cd build_scripts/macos
 ### Option 3: Manual Build
 ```bash
 # 1. Navigate to project directory
-cd path/to/paperlens-mini
+cd path/to/sintesa
 
 # 2. Activate virtual environment
 source venv/bin/activate
@@ -89,7 +89,7 @@ cd build_scripts/macos
 
 ## 📦 What You Get
 
-- **App Bundle**: `dist/PaperLensMini.app`
+- **App Bundle**: `dist/Sintesa.app`
 - **Size**: ~500 MB (includes Python runtime and all dependencies)
 - **Standalone**: No Python installation required on target machines
 
@@ -97,7 +97,7 @@ cd build_scripts/macos
 
 1. **Run the application**
    ```bash
-   open dist/PaperLensMini.app
+   open dist/Sintesa.app
    ```
 
 2. **Test core features**
@@ -118,18 +118,18 @@ cd build_scripts/macos
 chmod +x create_dmg.sh
 ./create_dmg.sh
 ```
-Creates: `PaperLensMini-1.0.0-macOS.dmg`
+Creates: `Sintesa-1.0.0-macOS.dmg`
 
 ### Option 3: ZIP Package
 ```bash
-zip -r PaperLensMini-macOS.zip dist/PaperLensMini.app
+zip -r Sintesa-macOS.zip dist/Sintesa.app
 ```
 
 ## 🔧 Troubleshooting
 
 ### "App is damaged and can't be opened"
 ```bash
-xattr -cr dist/PaperLensMini.app
+xattr -cr dist/Sintesa.app
 ```
 
 ### "PyInstaller not found"
@@ -169,7 +169,7 @@ chmod +x create_dmg.sh
    ```
 2. Clean rebuild:
    ```bash
-   pyinstaller paperlens_mini_macos.spec --clean --noconfirm
+   pyinstaller sintesa_macos.spec --clean --noconfirm
    ```
 3. If still failing, add missing modules to `hiddenimports` in spec file
 
@@ -192,7 +192,7 @@ chmod +x create_dmg.sh
    ```
 
 ### Reducing Size
-Edit `paperlens_mini_macos.spec`:
+Edit `sintesa_macos.spec`:
 ```python
 excludes = [
     'matplotlib',    # Remove if not needed
@@ -205,20 +205,20 @@ excludes = [
 ### Code Signing (Optional)
 ```bash
 # Sign the app
-codesign --deep --force --sign "Developer ID Application: Your Name" dist/PaperLensMini.app
+codesign --deep --force --sign "Developer ID Application: Your Name" dist/Sintesa.app
 
 # Verify signature
-codesign --verify --verbose dist/PaperLensMini.app
+codesign --verify --verbose dist/Sintesa.app
 ```
 
 ### Notarization (Optional)
 For distribution outside App Store:
 ```bash
 # Create ZIP for notarization
-ditto -c -k --keepParent dist/PaperLensMini.app PaperLensMini.zip
+ditto -c -k --keepParent dist/Sintesa.app Sintesa.zip
 
 # Submit for notarization
-xcrun notarytool submit PaperLensMini.zip --wait --apple-id "your@email.com" --password "app-password" --team-id "TEAM_ID"
+xcrun notarytool submit Sintesa.zip --wait --apple-id "your@email.com" --password "app-password" --team-id "TEAM_ID"
 ```
 
 ## 📊 Build Performance

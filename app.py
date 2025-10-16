@@ -1,6 +1,6 @@
 """
-PaperLens Mini - Main Application
-Simplified version without AI/ML models
+Sintesa - Main Application
+Simple Research Paper Analyzer
 """
 
 import webview
@@ -330,10 +330,10 @@ class API:
             return {
                 'success': True,
                 'app_info': {
-                    'name': 'PaperLens Mini',
+                    'name': 'Sintesa',
                     'version': APP_VERSION,
                     'description': 'Academic Paper Search and Analysis Tool',
-                    'author': 'PaperLens Team'
+                    'author': 'ArtonLabs'
                 }
             }
         except Exception as e:
@@ -361,7 +361,7 @@ class API:
 def main():
     """Main application entry point"""
     print("="*60)
-    print("PaperLens Mini - Simple Research Paper Analyzer")
+    print("Sintesa - Simple Research Paper Analyzer")
     print("="*60)
     print()
     
@@ -373,7 +373,7 @@ def main():
     
     # Create window
     window = webview.create_window(
-        'PaperLens Mini',
+        'Sintesa',
         str(ui_dir / "index.html"),
         js_api=api,
         width=1200,
@@ -382,7 +382,7 @@ def main():
         min_size=(1000, 600)
     )
     
-    print("[App] Starting PaperLens Mini...")
+    print("[App] Starting Sintesa...")
     webview.start(debug=True)
 
 

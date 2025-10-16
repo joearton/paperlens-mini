@@ -1,6 +1,6 @@
-# 📦 PaperLens Mini - Build & Distribution Guide
+# 📦 Sintesa - Build & Distribution Guide
 
-Welcome to the PaperLens Mini build system! This directory contains everything you need to create standalone executables for **macOS**, **Windows**, and **Linux**.
+Welcome to the Sintesa build system! This directory contains everything you need to create standalone executables for **macOS**, **Windows**, and **Linux**.
 
 ## 🎯 Quick Start
 
@@ -80,18 +80,18 @@ build_scripts/
 │
 ├── macos/                       # macOS build files
 │   ├── README.md               # Detailed macOS instructions
-│   ├── paperlens_mini_macos.spec    # PyInstaller configuration
+│   ├── sintesa_macos.spec    # PyInstaller configuration
 │   ├── build.sh                # Automated build script
 │   └── create_dmg.sh           # DMG creation script
 │
 ├── windows/                     # Windows build files
 │   ├── README.md               # Detailed Windows instructions
-│   ├── paperlens_mini_windows.spec  # PyInstaller configuration
+│   ├── sintesa_windows.spec  # PyInstaller configuration
 │   └── build.bat               # Automated build script
 │
 └── linux/                       # Linux build files
     ├── README.md               # Detailed Linux instructions
-    ├── paperlens_mini_linux.spec    # PyInstaller configuration
+    ├── sintesa_linux.spec    # PyInstaller configuration
     └── build.sh                # Automated build script
 ```
 
@@ -133,34 +133,34 @@ build_scripts/
 
 **App Bundle** (Built automatically)
 ```bash
-open dist/PaperLensMini.app
+open dist/Sintesa.app
 ```
 
 **DMG Installer** (Optional)
 ```bash
 cd macos
 ./create_dmg.sh
-# Creates: PaperLensMini-1.0.0-macOS.dmg
+# Creates: Sintesa-1.0.0-macOS.dmg
 ```
 
 ### Windows
 
 **Standalone EXE** (Built automatically)
 ```bash
-dist\PaperLensMini.exe
+dist\Sintesa.exe
 ```
 
 ### Linux
 
 **Directory Bundle** (Built automatically)
 ```bash
-./dist/PaperLensMini/PaperLensMini
+./dist/Sintesa/Sintesa
 ```
 
 **AppImage** (Recommended - Universal)
 ```bash
 # See linux/README.md for AppImage creation
-# Creates: PaperLensMini-1.0.0-x86_64.AppImage
+# Creates: Sintesa-1.0.0-x86_64.AppImage
 ```
 
 ## 🔍 What Gets Bundled
@@ -201,7 +201,7 @@ pip install pyinstaller
 ```bash
 # Add to hiddenimports in spec file
 # Then rebuild with --clean flag
-pyinstaller paperlens_mini_windows.spec --clean
+pyinstaller sintesa_windows.spec --clean
 ```
 
 ### "No module named 'pandas.plotting'"
@@ -220,7 +220,7 @@ This is normal. The bundle includes:
 
 **macOS**: "App is damaged"
 ```bash
-xattr -cr dist/PaperLensMini.app
+xattr -cr dist/Sintesa.app
 ```
 
 **Windows**: "Windows protected your PC"
@@ -230,7 +230,7 @@ Click "More info" → "Run anyway"
 
 **Linux**: Permission denied
 ```bash
-chmod +x dist/PaperLensMini/PaperLensMini
+chmod +x dist/Sintesa/Sintesa
 ```
 
 ## 🎨 Customization
@@ -267,9 +267,9 @@ Edit the `.spec` file for your platform:
 ### Functional Testing
 
 1. **Launch Application**
-   - macOS: `open dist/PaperLensMini.app`
-   - Windows: `dist\PaperLensMini.exe`
-   - Linux: `dist/PaperLensMini/PaperLensMini`
+   - macOS: `open dist/Sintesa.app`
+   - Windows: `dist\Sintesa.exe`
+   - Linux: `dist/Sintesa/Sintesa`
 
 2. **Test Core Features**
    - ✅ Search for papers
@@ -304,7 +304,7 @@ When releasing updates:
 
 ## 🌟 Success!
 
-You've successfully built PaperLens Mini for distribution! 🎉
+You've successfully built Sintesa for distribution! 🎉
 
 Your users can now:
 - Install without Python

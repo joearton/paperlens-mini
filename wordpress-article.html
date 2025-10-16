@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintesa: Alternatif Modern untuk Analisis Paper Akademik</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5em;
+            margin: 0 0 20px 0;
+            font-weight: 700;
+        }
+        
+        .hero .tagline {
+            font-size: 1.3em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .meta {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        h3 {
+            color: #764ba2;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .comparison-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .pros, .cons {
+            padding: 25px;
+            border-radius: 8px;
+        }
+        
+        .pros {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .cons {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .pros h4, .cons h4 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        
+        .pros h4 {
+            color: #2e7d32;
+        }
+        
+        .cons h4 {
+            color: #e65100;
+        }
+        
+        ul {
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+        
+        .cta-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .cta-box h3 {
+            color: white;
+            margin-top: 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .screenshot {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .tech-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8em;
+            }
+            
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>🔬 Sintesa: Alternatif Modern untuk Analisis Paper Akademik</h1>
+    <p class="tagline">Open-source research paper analyzer dengan visualisasi interaktif</p>
+</div>
+
+<div class="meta">
+    <strong>Kategori:</strong> Software, Research Tools, Academic<br>
+    <strong>Author:</strong> ArtonLabs<br>
+    <strong>Published:</strong> Oktober 2025<br>
+    <strong>Reading Time:</strong> 8 menit
+</div>
+
+<h2>🎯 Pengantar</h2>
+
+<p>Dalam dunia penelitian akademik, kemampuan untuk mencari, menganalisis, dan mengorganisir paper ilmiah adalah kunci kesuksesan. Selama bertahun-tahun, <strong>Publish or Perish</strong> telah menjadi pilihan utama bagi banyak peneliti untuk menganalisis citation metrics dan publikasi akademik.</p>
+
+<p>Namun, dengan perkembangan teknologi dan kebutuhan yang semakin beragam, muncul pertanyaan: <em>"Apakah ada alternatif yang lebih modern, fleksibel, dan sesuai dengan workflow penelitian masa kini?"</em></p>
+
+<p>Kenalkan <strong>Sintesa</strong> – sebuah aplikasi desktop open-source yang didesain untuk peneliti modern yang membutuhkan lebih dari sekedar citation metrics.</p>
+
+<h2>🌟 Apa itu Sintesa?</h2>
+
+<p><strong>Sintesa</strong> adalah aplikasi desktop berbasis Python yang membantu peneliti, mahasiswa, dan akademisi untuk:</p>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <h4>🔍 Multi-Source Search</h4>
+        <p>Mencari paper dari CrossRef (140M+ papers) dan arXiv dengan satu klik</p>
+    </div>
+    
+    <div class="feature-card">
+        <h4>📊 Interactive Visualizations</h4>
+        <p>5+ chart interaktif menggunakan Plotly untuk analisis tren penelitian</p>
+    </div>
+    
+    <div class="feature-card">
+        <h4>💾 Flexible Export</h4>
+        <p>Export ke PDF, Excel, CSV, atau JSON sesuai kebutuhan</p>
+    </div>
+    
+    <div class="feature-card">
+        <h4>🎨 Modern Interface</h4>
+        <p>Web-based UI dengan dark mode dan keyboard shortcuts</p>
+    </div>
+</div>
+
+<h3>Filosofi Desain</h3>
+
+<p>Sintesa dibangun dengan prinsip <strong>"Simplicity without Compromise"</strong>. Berbeda dengan tools yang membutuhkan ratusan MB hingga GB storage dan kompleksitas tinggi, Sintesa fokus pada fitur-fitur essential yang benar-benar dibutuhkan peneliti sehari-hari:</p>
+
+<ul>
+    <li>✅ <strong>Lightweight</strong>: ~50MB source code (tanpa AI/ML overhead)</li>
+    <li>✅ <strong>Fast</strong>: Startup dalam 2 detik</li>
+    <li>✅ <strong>Reliable</strong>: Data langsung dari sumber terpercaya</li>
+    <li>✅ <strong>Open Source</strong>: MIT License, bebas dimodifikasi</li>
+</ul>
+
+<h2>🆚 Sintesa vs Publish or Perish: Perbandingan Mendalam</h2>
+
+<p>Mari kita bandingkan Sintesa dengan Publish or Perish (PoP), tool yang sudah established di kalangan akademisi:</p>
+
+<table class="comparison-table">
+    <thead>
+        <tr>
+            <th>Aspek</th>
+            <th>Sintesa</th>
+            <th>Publish or Perish</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Platform</strong></td>
+            <td>Windows, macOS, Linux</td>
+            <td>Windows, macOS, Linux</td>
+        </tr>
+        <tr>
+            <td><strong>Ukuran Aplikasi</strong></td>
+            <td>~500 MB (bundled) / ~50 MB (source)</td>
+            <td>~20 MB</td>
+        </tr>
+        <tr>
+            <td><strong>Data Source</strong></td>
+            <td>CrossRef (140M+), arXiv</td>
+            <td>Google Scholar (primarily)</td>
+        </tr>
+        <tr>
+            <td><strong>Interface</strong></td>
+            <td>Modern Web-based, Dark Mode ✨</td>
+            <td>Classic Desktop UI</td>
+        </tr>
+        <tr>
+            <td><strong>Visualisasi</strong></td>
+            <td>5+ Interactive Plotly Charts 📊</td>
+            <td>Basic tables & static charts</td>
+        </tr>
+        <tr>
+            <td><strong>Export Format</strong></td>
+            <td>PDF, Excel, CSV, JSON</td>
+            <td>CSV, Excel, BibTeX, RTF</td>
+        </tr>
+        <tr>
+            <td><strong>Citation Metrics</strong></td>
+            <td>Basic (dari sources)</td>
+            <td>Advanced (h-index, g-index, dll) 📈</td>
+        </tr>
+        <tr>
+            <td><strong>Open Source</strong></td>
+            <td>✅ Yes (MIT License)</td>
+            <td>❌ Freeware (closed source)</td>
+        </tr>
+        <tr>
+            <td><strong>Development</strong></td>
+            <td>Active (Python-based)</td>
+            <td>Stable (Delphi-based)</td>
+        </tr>
+        <tr>
+            <td><strong>Customization</strong></td>
+            <td>Easy to modify (open source)</td>
+            <td>Limited (closed source)</td>
+        </tr>
+        <tr>
+            <td><strong>API Access</strong></td>
+            <td>Direct API (CrossRef, arXiv)</td>
+            <td>Via Google Scholar</td>
+        </tr>
+        <tr>
+            <td><strong>Biaya</strong></td>
+            <td>FREE & Open Source</td>
+            <td>FREE (Freeware)</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>💡 Kapan Menggunakan Sintesa vs Publish or Perish?</h2>
+
+<div class="pros-cons">
+    <div class="pros">
+        <h4>✅ Gunakan Sintesa Jika:</h4>
+        <ul>
+            <li>Membutuhkan <strong>visualisasi interaktif</strong> yang modern dan engaging</li>
+            <li>Ingin data langsung dari <strong>CrossRef</strong> atau <strong>arXiv</strong></li>
+            <li>Perlu <strong>export format beragam</strong> (JSON untuk programming, PDF untuk reports)</li>
+            <li>Suka <strong>interface modern</strong> dengan dark mode dan keyboard shortcuts</li>
+            <li>Ingin <strong>modifikasi atau extend</strong> functionality (open source)</li>
+            <li>Membutuhkan <strong>keyword network</strong> visualization</li>
+            <li>Prefer Python-based tools yang mudah di-integrate</li>
+        </ul>
+    </div>
+    
+    <div class="cons">
+        <h4>⚠️ Gunakan Publish or Perish Jika:</h4>
+        <ul>
+            <li>Fokus utama pada <strong>citation metrics</strong> (h-index, g-index, dll)</li>
+            <li>Primarily menggunakan <strong>Google Scholar</strong> sebagai sumber</li>
+            <li>Membutuhkan aplikasi yang <strong>sangat ringan</strong> (~20MB)</li>
+            <li>Sudah terbiasa dengan <strong>workflow PoP</strong> yang established</li>
+            <li>Perlu analisis <strong>author impact</strong> yang mendalam</li>
+            <li>Ingin <strong>BibTeX export</strong> langsung untuk LaTeX</li>
+            <li>Tidak perlu visualisasi yang fancy</li>
+        </ul>
+    </div>
+</div>
+
+<div class="highlight-box">
+    <strong>💡 Pro Tip:</strong> Kedua tools ini sebenarnya <strong>komplementer</strong>, bukan kompetitor! 
+    <ul style="margin-top: 10px;">
+        <li>Gunakan <strong>Publish or Perish</strong> untuk analisis citation metrics dan author impact</li>
+        <li>Gunakan <strong>Sintesa</strong> untuk visualisasi tren, keyword analysis, dan flexible data export</li>
+    </ul>
+</div>
+
+<h2>🎨 Fitur Unggulan Sintesa</h2>
+
+<h3>1. Multi-Source Paper Search</h3>
+<p>Berbeda dengan PoP yang fokus pada Google Scholar, Sintesa memberikan akses langsung ke:</p>
+<ul>
+    <li><strong>CrossRef API</strong> – 140 juta+ paper akademik dengan DOI</li>
+    <li><strong>arXiv</strong> – Preprint terbaru dari Physics, Math, CS, dan lainnya</li>
+    <li><strong>Google Scholar</strong> – Coming soon dengan rate limiting yang proper</li>
+</ul>
+
+<h3>2. Interactive Visualizations</h3>
+<p>Sintesa menggunakan <strong>Plotly.js</strong> untuk membuat visualisasi yang fully interactive:</p>
+<ul>
+    <li>📊 <strong>Publications per Year</strong> – Lihat tren publikasi dari waktu ke waktu</li>
+    <li>📈 <strong>Citation Distribution</strong> – Analisis impact berdasarkan citations</li>
+    <li>🕸️ <strong>Keyword Network</strong> – Visualisasi hubungan antar keyword (unique!)</li>
+    <li>⏱️ <strong>Timeline Chart</strong> – Scatter plot papers berdasarkan tahun</li>
+    <li>🥧 <strong>Source Distribution</strong> – Breakdown papers berdasarkan sumber</li>
+</ul>
+
+<p>Semua chart bisa di-zoom, pan, dan hover untuk detail. Export ke PNG juga tersedia!</p>
+
+<h3>3. Modern 3-Step Wizard Interface</h3>
+<p>Sintesa menggunakan workflow yang intuitive:</p>
+<ol>
+    <li><strong>Search</strong> – Enter keywords, pilih source, set filters</li>
+    <li><strong>Visualize</strong> – Generate all charts dengan 1 klik</li>
+    <li><strong>Export</strong> – Pilih format yang diinginkan</li>
+</ol>
+
+<p>Dengan <strong>keyboard shortcuts</strong>: F1 (Help), Ctrl+D (Dark Mode), ESC (Close modals)</p>
+
+<h3>4. Flexible Data Export</h3>
+<p>Export results dalam format yang paling sesuai dengan workflow Anda:</p>
+<ul>
+    <li>📄 <strong>PDF</strong> – Professional report dengan statistics summary</li>
+    <li>📊 <strong>Excel</strong> – Multiple sheets dengan pivot-ready data</li>
+    <li>📋 <strong>CSV</strong> – Simple untuk data analysis di R/Python/Excel</li>
+    <li>💻 <strong>JSON</strong> – Complete data structure untuk programming</li>
+</ul>
+
+<h2>🚀 Teknologi & Arsitektur</h2>
+
+<p>Sintesa dibangun dengan tech stack modern:</p>
+
+<div class="tech-stack">
+    <span class="tech-badge">Python 3.8+</span>
+    <span class="tech-badge">PyWebview</span>
+    <span class="tech-badge">Plotly</span>
+    <span class="tech-badge">Pandas</span>
+    <span class="tech-badge">HTML5/CSS3</span>
+    <span class="tech-badge">JavaScript ES6+</span>
+    <span class="tech-badge">CrossRef API</span>
+    <span class="tech-badge">arXiv API</span>
+</div>
+
+<p><strong>Backend (Python):</strong></p>
+<ul>
+    <li>PyWebview untuk desktop app framework</li>
+    <li>Plotly untuk generating interactive charts</li>
+    <li>Pandas untuk data processing</li>
+    <li>Requests untuk API calls</li>
+</ul>
+
+<p><strong>Frontend (Web):</strong></p>
+<ul>
+    <li>Modern HTML5/CSS3 dengan responsive design</li>
+    <li>Vanilla JavaScript (no heavy frameworks)</li>
+    <li>Plotly.js untuk rendering charts</li>
+    <li>Font Awesome untuk icons</li>
+</ul>
+
+<h2>📦 Installation & Usage</h2>
+
+<h3>Quick Start (3 cara):</h3>
+
+<p><strong>1. Download Executable (Paling Mudah)</strong></p>
+<ul>
+    <li>Windows: <code>Sintesa.exe</code> (~500 MB)</li>
+    <li>macOS: <code>Sintesa.app</code> (~500 MB)</li>
+    <li>Linux: <code>Sintesa</code> (~500 MB)</li>
+</ul>
+<p>Double-click dan langsung jalan, no installation required!</p>
+
+<p><strong>2. Run from Source (Developer)</strong></p>
+<pre><code>git clone https://github.com/artonlabs/sintesa.git
+cd sintesa
+pip install -r requirements.txt
+python app.py
+</code></pre>
+
+<p><strong>3. Use Run Scripts</strong></p>
+<ul>
+    <li>Windows: <code>run.bat</code></li>
+    <li>Linux/Mac: <code>./run.sh</code></li>
+</ul>
+<p>Auto-setup virtual environment dan install dependencies.</p>
+
+<h2>🎯 Use Cases</h2>
+
+<h3>Untuk Peneliti:</h3>
+<ul>
+    <li>📚 <strong>Literature Review</strong> – Cari dan visualisasi tren dalam field tertentu</li>
+    <li>🔬 <strong>Gap Analysis</strong> – Identifikasi area yang under-researched via keyword network</li>
+    <li>📊 <strong>Publication Trends</strong> – Analisis bagaimana topik berkembang over time</li>
+</ul>
+
+<h3>Untuk Mahasiswa:</h3>
+<ul>
+    <li>📝 <strong>Thesis/Dissertation</strong> – Gather dan organize references</li>
+    <li>🎓 <strong>Assignment</strong> – Quick search untuk specific topics</li>
+    <li>📈 <strong>Presentation</strong> – Beautiful charts untuk slides</li>
+</ul>
+
+<h3>Untuk Institusi:</h3>
+<ul>
+    <li>🏫 <strong>Research Monitoring</strong> – Track publikasi di specific fields</li>
+    <li>📊 <strong>Reporting</strong> – Generate reports untuk stakeholders</li>
+    <li>🔍 <strong>Benchmarking</strong> – Compare dengan institusi lain</li>
+</ul>
+
+<h2>🔮 Roadmap & Future Development</h2>
+
+<p>Sintesa actively developed dengan roadmap yang jelas:</p>
+
+<p><strong>Version 1.1.0 (Q1 2026):</strong></p>
+<ul>
+    <li>Google Scholar integration dengan proper rate limiting</li>
+    <li>Additional export templates</li>
+    <li>Custom visualization themes</li>
+    <li>Search history export</li>
+</ul>
+
+<p><strong>Version 1.2.0 (Q2 2026):</strong></p>
+<ul>
+    <li>Batch processing capabilities</li>
+    <li>Advanced filtering options</li>
+    <li>Citation network visualization</li>
+    <li>Plugin system untuk extensibility</li>
+</ul>
+
+<h2>💬 Community & Support</h2>
+
+<p>Sebagai project open-source, Sintesa memiliki growing community:</p>
+<ul>
+    <li>🌐 <strong>GitHub</strong>: Star, fork, contribute!</li>
+    <li>📧 <strong>Email</strong>: support@artonlabs.com</li>
+    <li>🐛 <strong>Issues</strong>: Report bugs atau request features</li>
+    <li>💡 <strong>Discussions</strong>: Share tips dan tricks</li>
+</ul>
+
+<h2>🎬 Kesimpulan</h2>
+
+<p><strong>Publish or Perish</strong> tetap menjadi tool yang excellent untuk citation metrics dan author analysis. Namun, jika Anda mencari alternatif yang:</p>
+
+<ul>
+    <li>✅ Lebih modern dan visual</li>
+    <li>✅ Multi-source (CrossRef + arXiv)</li>
+    <li>✅ Open source dan customizable</li>
+    <li>✅ Interactive visualizations</li>
+    <li>✅ Flexible export options</li>
+</ul>
+
+<p>Maka <strong>Sintesa</strong> adalah pilihan yang tepat untuk Anda!</p>
+
+<div class="highlight-box">
+    <strong>💡 Remember:</strong> Tools adalah alat bantu. Yang terpenting adalah <strong>kualitas research</strong> Anda sendiri. Sintesa dan Publish or Perish hanya membantu Anda bekerja lebih efisien! 🚀
+</div>
+
+<div class="cta-box">
+    <h3>🚀 Siap Mencoba Sintesa?</h3>
+    <p>Download sekarang atau contribute ke project!</p>
+    <a href="https://github.com/artonlabs/sintesa" class="btn">⭐ Star on GitHub</a>
+    <a href="https://github.com/artonlabs/sintesa/releases" class="btn">⬇️ Download</a>
+    <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.9;">
+        Free & Open Source · MIT License · Made with ❤️ by ArtonLabs
+    </p>
+</div>
+
+<hr style="margin: 40px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+<div style="text-align: center; color: #666; font-size: 0.9em;">
+    <p><strong>Tags:</strong> research tools, academic software, citation analysis, publish or perish alternative, paper search, open source research, sintesa, artonlabs</p>
+    <p><strong>Share artikel ini:</strong> Twitter · LinkedIn · Facebook · Reddit</p>
+</div>
+
+</body>
+</html>
+
